@@ -1,0 +1,1 @@
+export { default as PromptGenerationForm } from './PromptGenerationForm'
