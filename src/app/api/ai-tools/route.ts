@@ -18,7 +18,9 @@ export async function GET(request: NextRequest) {
 
         // Apply filters
         if (category && category !== 'all') {
-            tools = getToolsByCategory(category);
+            // Convert string to AIToolCategory enum
+            const categoryEnum = category as AIToolCategory;
+            tools = getToolsByCategory(categoryEnum);
         }
 
         if (subject && subject !== 'all') {

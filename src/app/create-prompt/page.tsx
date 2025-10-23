@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FileUpload } from '@/components/forms/FileUpload';
 import { PromptDisplay } from '@/components/forms/PromptDisplay';
-import { AIToolButtons } from '@/components/integration/AIToolButtons';
+// import { AIToolButtons } from '@/components/integration/AIToolButtons';
 import PromptEditor from '@/components/prompt/PromptEditor';
 import AIToolSelector from '@/components/ai-tools/AIToolSelector';
 import TemplateSelector from '@/components/templates/TemplateSelector';
@@ -27,7 +27,7 @@ export default function CreatePromptPage() {
         grade: 6,
         lessonName: '',
         objectives: '',
-        outputType: 'lesson-plan'
+        outputType: 'curriculum-creation'
     });
 
     const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -49,12 +49,7 @@ export default function CreatePromptPage() {
         'Công nghệ'
     ];
 
-    const outputTypes = [
-        { value: 'lesson-plan', label: 'Giáo án', icon: '📚', color: 'blue' },
-        { value: 'presentation', label: 'Slide thuyết trình', icon: '📊', color: 'green' },
-        { value: 'assessment', label: 'Câu hỏi đánh giá', icon: '📝', color: 'purple' },
-        { value: 'interactive', label: 'Hoạt động tương tác', icon: '🎮', color: 'orange' }
-    ];
+
 
     const handleInputChange = (field: keyof FormData, value: string | number) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -96,7 +91,7 @@ export default function CreatePromptPage() {
 
     const generatePrompt = async () => {
         if (!formData.lessonName.trim()) {
-            alert('Vui lòng nhập tên bài học');
+            alert('Vui lòng nhập chủ đề giáo trình');
             return;
         }
 
@@ -126,19 +121,30 @@ export default function CreatePromptPage() {
     };
 
     const createFallbackPrompt = (data: FormData): string => {
-        return `Bạn là một giáo viên ${data.subject} chuyên nghiệp. Hãy tạo ${data.outputType === 'lesson-plan' ? 'giáo án' : 'nội dung'} chi tiết cho bài học "${data.lessonName}" lớp ${data.grade}.
+        return `Bạn là một chuyên gia giáo dục và biên soạn giáo trình ${data.subject} chuyên nghiệp. Hãy tạo giáo trình chi tiết về chủ đề "${data.lessonName}" cho học sinh lớp ${data.grade}.
 
-**Thông tin bài học:**
+**Thông tin giáo trình:**
 - Môn học: ${data.subject}
 - Lớp: ${data.grade}
-- Tên bài: ${data.lessonName}
+- Chủ đề: ${data.lessonName}
 - Mục tiêu: ${data.objectives}
 
-**Yêu cầu:**
+**Yêu cầu biên soạn giáo trình:**
 - Tuân thủ chặt chẽ chuẩn GDPT 2018 và Công văn 5512
-- Áp dụng phương pháp dạy học tích cực
-- Bao gồm hoạt động cá nhân và nhóm
-- Có đánh giá năng lực học sinh
+- Cấu trúc rõ ràng với các chương, mục, tiểu mục
+- Nội dung khoa học, chính xác, phù hợp độ tuổi
+- Bao gồm lý thuyết, ví dụ minh họa, bài tập thực hành
+- Có hệ thống câu hỏi và bài tập đa dạng
+- Phương pháp dạy học tích cực và đánh giá năng lực
+- Tích hợp giáo dục kỹ năng sống và giá trị nhân văn
+
+**Cấu trúc giáo trình cần có:**
+1. Mục tiêu học tập
+2. Nội dung kiến thức cốt lõi
+3. Ví dụ và bài tập minh họa
+4. Hoạt động thực hành
+5. Câu hỏi tự đánh giá
+6. Tài liệu tham khảo
 
 ${data.uploadedContent ? `\n**Tài liệu tham khảo:**\n${data.uploadedContent}\n` : ''}
 
@@ -232,15 +238,20 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
         }
     };
 
-    const getColorClasses = (color: string, isSelected: boolean) => {
-        const colors = {
-            blue: isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
-            green: isSelected ? 'bg-green-600 text-white border-green-600' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
-            purple: isSelected ? 'bg-purple-600 text-white border-purple-600' : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100',
-            orange: isSelected ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100'
-        };
-        return colors[color as keyof typeof colors] || colors.blue;
-    };
+    // const getColorClasses = (color: string, isSelected: boolean) => {
+    //     const colors = {
+    //         blue: isSelected ? 'bg-blue-600 text-white border-blue-600' : 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100',
+    //         green: isSelected ? 'bg-green-600 text-white border-green-600' : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+    //         purple: isSelected ? 'bg-purple-600 text-white border-purple-600' : 'bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100',
+    //         orange: isSelected ? 'bg-orange-600 text-white border-orange-600' : 'bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100',
+    //         red: isSelected ? 'bg-red-600 text-white border-red-600' : 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100',
+    //         pink: isSelected ? 'bg-pink-600 text-white border-pink-600' : 'bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100',
+    //         indigo: isSelected ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100',
+    //         yellow: isSelected ? 'bg-yellow-600 text-white border-yellow-600' : 'bg-yellow-50 text-yellow-700 border-yellow-200 hover:bg-yellow-100',
+    //         gray: isSelected ? 'bg-gray-600 text-white border-gray-600' : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+    //     };
+    //     return colors[color as keyof typeof colors] || colors.blue;
+    // };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -248,10 +259,10 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                 {/* Header */}
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                        Tạo Prompt AI cho Giáo viên
+                        Tạo Prompt Giáo Trình
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Hệ thống thông minh tạo prompt tuân thủ GDPT 2018 và CV 5512
+                        Hệ thống thông minh tạo prompt cho giáo trình và tài liệu giảng dạy tuân thủ GDPT 2018 và CV 5512
                     </p>
                 </div>
 
@@ -264,7 +275,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 <span className="bg-blue-100 text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-sm">
                                     📚
                                 </span>
-                                Thông tin bài học
+                                Thông tin giáo trình
                             </h2>
 
                             <div className="space-y-4">
@@ -307,13 +318,13 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 {/* Lesson Name */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Tên bài học *
+                                        Chủ đề giáo trình *
                                     </label>
                                     <input
                                         type="text"
                                         value={formData.lessonName}
                                         onChange={(e) => handleInputChange('lessonName', e.target.value)}
-                                        placeholder="Ví dụ: Phương trình bậc nhất một ẩn"
+                                        placeholder="Ví dụ: Phương trình bậc nhất một ẩn, Văn học dân gian Việt Nam"
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
@@ -321,12 +332,12 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 {/* Objectives */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Mục tiêu bài học
+                                        Mục tiêu giáo trình
                                     </label>
                                     <textarea
                                         value={formData.objectives}
                                         onChange={(e) => handleInputChange('objectives', e.target.value)}
-                                        placeholder="Mục tiêu kiến thức, kỹ năng, thái độ..."
+                                        placeholder="Mục tiêu kiến thức, kỹ năng, thái độ cần đạt được qua giáo trình..."
                                         rows={3}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
@@ -334,29 +345,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                             </div>
                         </div>
 
-                        {/* Output Type Selection */}
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                Loại prompt cần tạo
-                            </h3>
-                            <div className="grid grid-cols-2 gap-3">
-                                {outputTypes.map((type) => (
-                                    <button
-                                        key={type.value}
-                                        onClick={() => handleInputChange('outputType', type.value)}
-                                        className={`p-4 rounded-lg border-2 text-left transition-all ${getColorClasses(
-                                            type.color,
-                                            formData.outputType === type.value
-                                        )}`}
-                                    >
-                                        <div className="flex items-center">
-                                            <span className="text-2xl mr-3">{type.icon}</span>
-                                            <span className="font-medium">{type.label}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+
 
                         {/* Template Toggle */}
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -455,15 +444,15 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
-                                                Đang tạo prompt...
+                                                Đang tạo prompt giáo trình...
                                             </span>
                                         ) : (
-                                            '🚀 Tạo Prompt'
+                                            '📚 Tạo Prompt Giáo Trình'
                                         )}
                                     </button>
                                     {useTemplate && !selectedTemplate && (
                                         <p className="text-sm text-gray-500 text-center mt-2">
-                                            Chọn template ở trên hoặc tạo prompt tự do
+                                            Chọn template ở trên hoặc tạo prompt giáo trình tự do
                                         </p>
                                     )}
                                 </div>
@@ -540,7 +529,30 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                         </div>
                                     )}
 
-
+                                    {/* Action Buttons */}
+                                    <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-200">
+                                        <button
+                                            onClick={handleCopyPrompt}
+                                            className="flex items-center px-3 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+                                        >
+                                            <span className="mr-1">📋</span>
+                                            Sao chép
+                                        </button>
+                                        <button
+                                            onClick={handleSaveToPersonalLibrary}
+                                            className="flex items-center px-3 py-2 bg-green-50 text-green-700 border border-green-200 rounded-lg hover:bg-green-100 transition-colors text-sm"
+                                        >
+                                            <span className="mr-1">💾</span>
+                                            Lưu cá nhân
+                                        </button>
+                                        <button
+                                            onClick={handleShareToCommunity}
+                                            className="flex items-center px-3 py-2 bg-purple-50 text-purple-700 border border-purple-200 rounded-lg hover:bg-purple-100 transition-colors text-sm"
+                                        >
+                                            <span className="mr-1">🌍</span>
+                                            Chia sẻ cộng đồng
+                                        </button>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="text-center py-12 text-gray-500">
@@ -551,7 +563,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                     <p className="text-sm">
                                         {useTemplate
                                             ? 'Chọn template và điền thông tin để bắt đầu'
-                                            : 'Điền thông tin bài học và nhấn "Tạo Prompt" để bắt đầu'
+                                            : 'Điền thông tin giáo trình và nhấn "Tạo Prompt" để bắt đầu'
                                         }
                                     </p>
                                 </div>
@@ -562,17 +574,47 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                         {formData.subject && formData.grade >= 6 && formData.grade <= 9 && (
                             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                    🤖 Công cụ AI được đề xuất
+                                    📚 Công cụ AI đề xuất cho tạo giáo trình
                                 </h3>
                                 <AIToolSelector
                                     subject={formData.subject}
                                     gradeLevel={formData.grade as 6 | 7 | 8 | 9}
-                                    outputType={formData.outputType as 'lesson-plan' | 'presentation' | 'assessment'}
+                                    outputType="curriculum-creation"
                                     onToolSelect={handleAIToolSelect}
                                     selectedTool={selectedAITool}
                                 />
                             </div>
                         )}
+
+                        {/* Tips and Usage Guide */}
+                        {generatedPrompt && (
+                            <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-xl p-6">
+                                <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                                    <span className="mr-2">💡</span>
+                                    Mẹo tạo giáo trình hiệu quả
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <h4 className="font-medium text-gray-800 mb-2">📚 Tối ưu nội dung</h4>
+                                        <ul className="text-gray-700 space-y-1">
+                                            <li>• Yêu cầu "Thêm bài tập thực hành" để tăng tính ứng dụng</li>
+                                            <li>• Nói "Bổ sung ví dụ Việt Nam" để gần gũi hơn</li>
+                                            <li>• Thêm "Tạo sơ đồ tư duy" để dễ hiểu</li>
+                                        </ul>
+                                    </div>
+                                    <div>
+                                        <h4 className="font-medium text-gray-800 mb-2">🔄 Sau khi tạo</h4>
+                                        <ul className="text-gray-700 space-y-1">
+                                            <li>• Lưu vào thư viện để phát triển thành bộ giáo trình</li>
+                                            <li>• Chia sẻ với cộng đồng để cùng hoàn thiện</li>
+                                            <li>• Sử dụng với AI tool để tạo nội dung chi tiết</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+
                     </div>
                 </div>
             </div>

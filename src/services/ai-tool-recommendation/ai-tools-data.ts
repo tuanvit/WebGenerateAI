@@ -717,7 +717,7 @@ export const getToolsBySubject = (subject: string): AIToolDetails[] => {
     return AI_TOOLS_DATABASE.filter(tool => tool.subjects.includes(subject));
 };
 
-export const getToolsByGradeLevel = (gradeLevel: number): AIToolDetails[] => {
+export const getToolsByGradeLevel = (gradeLevel: 6 | 7 | 8 | 9): AIToolDetails[] => {
     return AI_TOOLS_DATABASE.filter(tool => tool.gradeLevel.includes(gradeLevel));
 };
 
@@ -741,4 +741,49 @@ export const searchTools = (query: string): AIToolDetails[] => {
         tool.useCase.toLowerCase().includes(lowercaseQuery) ||
         tool.subjects.some(subject => subject.toLowerCase().includes(lowercaseQuery))
     );
+};
+
+export const getCurriculumCreationTools = (subject?: string, gradeLevel?: 6 | 7 | 8 | 9): AIToolDetails[] => {
+    // Tools specifically good for curriculum/textbook creation
+    const curriculumToolIds = [
+        // Primary text generation tools for curriculum content
+        'chatgpt', 'gemini', 'copilot', 'perplexity-ai',
+        // Presentation tools for visual curriculum materials
+        'canva-ai', 'gamma', 'tome',
+        // Assessment tools for exercises and questions
+        'quizizz-ai', 'questionwell', 'formative-ai',
+        // Image tools for illustrations
+        'microsoft-designer', 'leonardo-ai',
+        // Data visualization for educational charts
+        'flourish', 'datawrapper'
+    ];
+
+    let tools = AI_TOOLS_DATABASE.filter(tool => curriculumToolIds.includes(tool.id));
+
+    // Filter by subject if provided
+    if (subject) {
+        tools = tools.filter(tool => tool.subjects.includes(subject));
+    }
+
+    // Filter by grade level if provided
+    if (gradeLevel) {
+        tools = tools.filter(tool => tool.gradeLevel.includes(gradeLevel));
+    }
+
+    // Sort by relevance for curriculum creation:
+    // 1. Vietnamese support first
+    // 2. Free/freemium tools first
+    // 3. Beginner-friendly tools first
+    return tools.sort((a, b) => {
+        if (a.vietnameseSupport && !b.vietnameseSupport) return -1;
+        if (!a.vietnameseSupport && b.vietnameseSupport) return 1;
+
+        if (a.pricingModel === 'free' && b.pricingModel !== 'free') return -1;
+        if (a.pricingModel !== 'free' && b.pricingModel === 'free') return 1;
+
+        if (a.difficulty === 'beginner' && b.difficulty !== 'beginner') return -1;
+        if (a.difficulty !== 'beginner' && b.difficulty === 'beginner') return 1;
+
+        return 0;
+    });
 };
