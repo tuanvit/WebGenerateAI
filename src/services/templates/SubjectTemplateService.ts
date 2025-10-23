@@ -17,6 +17,7 @@ export interface PromptTemplate {
 export interface TemplateVariable {
     name: string;
     label: string;
+    description?: string;
     type: 'text' | 'textarea' | 'select' | 'multiselect';
     required: boolean;
     placeholder?: string;
@@ -375,6 +376,10 @@ export class SubjectTemplateService {
 
             return scoreB - scoreA;
         });
+    }
+
+    async getAllTemplates(): Promise<PromptTemplate[]> {
+        return this.templates;
     }
 
     async getTemplateById(templateId: string): Promise<PromptTemplate | null> {

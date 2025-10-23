@@ -8,6 +8,7 @@ import PromptEditor from '@/components/prompt/PromptEditor';
 import AIToolSelector from '@/components/ai-tools/AIToolSelector';
 import TemplateSelector from '@/components/templates/TemplateSelector';
 import TemplateRenderer from '@/components/templates/TemplateRenderer';
+import TemplateBrowser from '@/components/templates/TemplateBrowser';
 import { AITool } from '@/services/ai-tool-recommendation';
 import { PromptTemplate } from '@/services/templates/SubjectTemplateService';
 
@@ -37,6 +38,7 @@ export default function CreatePromptPage() {
     const [selectedTemplate, setSelectedTemplate] = useState<PromptTemplate | null>(null);
     const [useTemplate, setUseTemplate] = useState(true);
     const [templateVariables, setTemplateVariables] = useState<Record<string, string>>({});
+    const [showTemplateBrowser, setShowTemplateBrowser] = useState(false);
 
     const subjects = [
         'Toán',
@@ -75,6 +77,15 @@ export default function CreatePromptPage() {
     const handleTemplatePromptGenerated = (prompt: string, variables: Record<string, string>) => {
         setGeneratedPrompt(prompt);
         setTemplateVariables(variables);
+    };
+
+    const handleTemplateBrowserSelect = (template: PromptTemplate) => {
+        setSelectedTemplate(template);
+        setShowTemplateBrowser(false);
+        // Auto-switch to template mode if not already
+        if (!useTemplate) {
+            setUseTemplate(true);
+        }
     };
 
     const handleFileUpload = async (file: File) => {
@@ -132,6 +143,93 @@ export default function CreatePromptPage() {
 ${data.uploadedContent ? `\n**Tài liệu tham khảo:**\n${data.uploadedContent}\n` : ''}
 
 Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các yêu cầu trên.`;
+    };
+
+    const handleSaveToPersonalLibrary = async () => {
+        if (!generatedPrompt) return;
+
+        try {
+            const response = await fetch('/api/library/prompts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formData.lessonName || 'Prompt không có tiêu đề',
+                    content: generatedPrompt,
+                    subject: formData.subject,
+                    gradeLevel: formData.grade,
+                    outputType: formData.outputType,
+                    inputParameters: formData,
+                    templateId: selectedTemplate?.id,
+                    templateVariables: templateVariables
+                }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('✅ Đã lưu prompt vào thư viện cá nhân!');
+            } else {
+                alert('❌ Lỗi khi lưu prompt: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error saving prompt:', error);
+            alert('❌ Lỗi kết nối khi lưu prompt');
+        }
+    };
+
+    const handleShareToCommunity = async () => {
+        if (!generatedPrompt) return;
+
+        try {
+            const response = await fetch('/api/community/share', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formData.lessonName || 'Prompt không có tiêu đề',
+                    content: generatedPrompt,
+                    subject: formData.subject,
+                    gradeLevel: formData.grade,
+                    outputType: formData.outputType,
+                    tags: [
+                        '#GDPT2018',
+                        '#CV5512',
+                        `#${formData.subject}`,
+                        `#Lớp${formData.grade}`,
+                        selectedTemplate ? '#Template' : '#TựDo'
+                    ],
+                    inputParameters: formData,
+                    templateId: selectedTemplate?.id
+                }),
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                alert('🌍 Đã chia sẻ prompt lên cộng đồng!');
+            } else {
+                alert('❌ Lỗi khi chia sẻ: ' + result.error);
+            }
+        } catch (error) {
+            console.error('Error sharing prompt:', error);
+            alert('❌ Lỗi kết nối khi chia sẻ prompt');
+        }
+    };
+
+    const handleCopyPrompt = async () => {
+        if (!generatedPrompt) return;
+
+        try {
+            await navigator.clipboard.writeText(generatedPrompt);
+            alert('📋 Đã sao chép prompt vào clipboard!');
+        } catch (error) {
+            console.error('Error copying prompt:', error);
+            // Fallback for older browsers
+            const textArea = document.createElement('textarea');
+            textArea.value = generatedPrompt;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('📋 Đã sao chép prompt vào clipboard!');
+        }
     };
 
     const getColorClasses = (color: string, isSelected: boolean) => {
@@ -309,9 +407,28 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                         }}
                                     />
 
-                                    {/* Clear Template Button */}
-                                    {selectedTemplate && (
-                                        <div className="mt-3 pt-3 border-t border-gray-200">
+                                    {/* Template Actions */}
+                                    <div className="mt-3 pt-3 border-t border-gray-200 flex items-center justify-between">
+                                        <div className="flex space-x-4">
+                                            <button
+                                                onClick={() => setShowTemplateBrowser(true)}
+                                                className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
+                                            >
+                                                <span className="mr-1">🔍</span>
+                                                Duyệt templates
+                                            </button>
+                                            <a
+                                                href="/templates"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-purple-600 hover:text-purple-800 flex items-center"
+                                            >
+                                                <span className="mr-1">🌐</span>
+                                                Quản lý templates
+                                            </a>
+                                        </div>
+
+                                        {selectedTemplate && (
                                             <button
                                                 onClick={() => setSelectedTemplate(null)}
                                                 className="text-sm text-gray-600 hover:text-red-600 flex items-center"
@@ -319,8 +436,8 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                                 <span className="mr-1">✕</span>
                                                 Bỏ chọn template
                                             </button>
-                                        </div>
-                                    )}
+                                        )}
+                                    </div>
                                 </div>
                             )}
 
@@ -459,6 +576,35 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                     </div>
                 </div>
             </div>
+
+            {/* Template Browser Modal */}
+            {showTemplateBrowser && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                    <div className="bg-white rounded-lg max-w-7xl w-full max-h-[90vh] overflow-hidden">
+                        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                                Chọn Template
+                            </h3>
+                            <button
+                                onClick={() => setShowTemplateBrowser(false)}
+                                className="text-gray-400 hover:text-gray-600 text-xl"
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div className="p-4 overflow-y-auto max-h-[calc(90vh-120px)]">
+                            <TemplateBrowser
+                                subject={formData.subject}
+                                gradeLevel={formData.grade}
+                                outputType={formData.outputType}
+                                onSelectTemplate={handleTemplateBrowserSelect}
+                                selectedTemplateId={selectedTemplate?.id}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

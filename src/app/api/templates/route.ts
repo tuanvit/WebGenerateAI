@@ -28,15 +28,13 @@ export async function GET(request: NextRequest) {
             // Get templates by output type
             templates = await subjectTemplateService.getTemplatesByOutputType(outputType);
         } else {
-            return NextResponse.json(
-                { error: 'Cần cung cấp subject, outputType, gradeLevel hoặc query parameter' },
-                { status: 400 }
-            );
+            // Get all templates if no filters provided
+            templates = await subjectTemplateService.getAllTemplates();
         }
 
         return NextResponse.json({
             success: true,
-            data: templates,
+            templates: templates,
             meta: {
                 count: templates.length,
                 filters: { subject, outputType, gradeLevel, query }

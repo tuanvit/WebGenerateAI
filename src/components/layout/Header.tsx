@@ -199,6 +199,20 @@ export default function Header() {
                     {isMenuOpen && (
                         <div className="md:hidden" role="navigation" aria-label="Menu di động">
                             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
+                                <Link
+                                    href="/create-prompt"
+                                    className="block text-gray-700 hover:text-blue-600 hover:bg-gray-50 px-3 py-2 rounded-md text-base font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    ✨ Tạo Prompt
+                                </Link>
+                                <Link
+                                    href="/templates"
+                                    className="block text-gray-700 hover:text-purple-600 hover:bg-purple-50 px-3 py-2 rounded-md text-base font-medium focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    📚 Prompt Mẫu
+                                </Link>
                                 {isAuthenticated ? (
                                     <>
                                         <div className="px-3 py-2 text-sm font-medium text-gray-900 border-b border-gray-200 mb-2">

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import Header from "@/components/layout/Header"
 import Link from "next/link"
-import TrendingAITools from "@/components/ai-tools/TrendingAITools"
+import AIToolsBrowserWithFilters from "@/components/ai-tools/AIToolsBrowserWithFilters"
 
 export default function Dashboard() {
     const { data: session, status } = useSession()
@@ -39,7 +39,7 @@ export default function Dashboard() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 <div className="mb-8">
                     <h1 className="text-3xl font-bold text-gray-900">
-                        Xin chào, {session.user.name}!
+                        Xin chào, {session.user?.name || 'Bạn'}!
                     </h1>
                     <p className="mt-2 text-gray-600">
                         Chào mừng bạn đến với AI Prompt Generator for Teachers
@@ -198,10 +198,10 @@ export default function Dashboard() {
                     </div>
                 </div>
 
-                {/* Trending AI Tools Section */}
+                {/* AI Tools Browser Section */}
                 <div className="mt-12">
                     <div className="bg-white rounded-lg shadow p-6">
-                        <TrendingAITools limit={6} />
+                        <AIToolsBrowserWithFilters initialLimit={12} />
                     </div>
                 </div>
 
@@ -230,7 +230,7 @@ export default function Dashboard() {
                             </div>
                             <div className="ml-4">
                                 <p className="text-green-100">Công cụ AI</p>
-                                <p className="text-2xl font-bold">50+</p>
+                                <p className="text-2xl font-bold">35+</p>
                             </div>
                         </div>
                     </div>

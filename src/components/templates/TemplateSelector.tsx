@@ -47,7 +47,7 @@ export default function TemplateSelector({
             const result = await response.json();
 
             if (result.success) {
-                setTemplates(result.data);
+                setTemplates(result.templates || []);
             } else {
                 setError(result.error || 'Không thể tải danh sách template');
             }
@@ -67,7 +67,7 @@ export default function TemplateSelector({
             const result = await response.json();
 
             if (result.success) {
-                setTemplates(result.data);
+                setTemplates(result.templates || []);
                 setShowAllTemplates(true);
             } else {
                 setError(result.error || 'Không thể tải danh sách template');

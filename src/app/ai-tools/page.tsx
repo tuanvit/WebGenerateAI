@@ -1,9 +1,11 @@
 import React from 'react';
-import AIToolBrowser from '@/components/ai-tools/AIToolBrowser';
+import AIToolsBrowserWithFilters from '@/components/ai-tools/AIToolsBrowserWithFilters';
+import Header from '@/components/layout/Header';
 
 export default function AIToolsPage() {
     return (
         <div className="min-h-screen bg-gray-50">
+            <Header />
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {/* Header */}
                 <div className="mb-8">
@@ -11,7 +13,7 @@ export default function AIToolsPage() {
                         Thư viện Công cụ AI
                     </h1>
                     <p className="text-lg text-gray-600">
-                        Khám phá hơn 50 công cụ AI chuyên biệt cho giáo dục, được phân loại theo môn học và mục đích sử dụng
+                        Khám phá 35+ công cụ AI chuyên biệt cho giáo dục THCS, được phân loại theo môn học và mục đích sử dụng
                     </p>
                 </div>
 
@@ -57,7 +59,7 @@ export default function AIToolsPage() {
 
                 {/* Main Content */}
                 <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                    <AIToolBrowser />
+                    <AIToolsBrowserWithFilters showHeader={false} initialLimit={24} />
                 </div>
 
                 {/* Footer Info */}

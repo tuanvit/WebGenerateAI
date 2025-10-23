@@ -210,6 +210,20 @@ export default function TemplateRenderer({
                         </span>
                     ))}
                 </div>
+
+                {/* Recommended AI Tools */}
+                {template.recommendedTools && template.recommendedTools.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-blue-200">
+                        <div className="text-xs text-blue-700 mb-2">🤖 Công cụ AI được đề xuất:</div>
+                        <div className="flex flex-wrap gap-2">
+                            {template.recommendedTools.map((tool, index) => (
+                                <span key={index} className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
+                                    {tool}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Template Variables Form */}

@@ -43,7 +43,7 @@ export default function Home() {
             ) : session ? (
               <>
                 <Link
-                  href="/generate"
+                  href="/create-prompt"
                   className="group relative px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   <span className="flex items-center">
