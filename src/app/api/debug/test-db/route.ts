@@ -1,47 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db-utils';
+import { prisma } from '@/lib/db';
 
-/**
- * GET /api/debug/test-db - Test database connection
- */
 export async function GET(request: NextRequest) {
     try {
-        // Test basic connection
+        // Test database connection
         const userCount = await prisma.user.count();
-        const contentCount = await prisma.sharedContent.count();
-        const ratingCount = await prisma.contentRating.count();
 
-        // Test a simple query
-        const sampleUser = await prisma.user.findFirst({
-            select: {
-                id: true,
-                name: true,
-                email: true
+        // Test creating a simple user
+        const testUser = await prisma.user.upsert({
+            where: { email: 'test@example.com' },
+            update: { name: 'Test User Updated' },
+            create: {
+                email: 'test@example.com',
+                name: 'Test User',
+                subjects: JSON.stringify(['Test']),
+                gradeLevel: JSON.stringify([6]),
+                role: 'user'
             }
         });
 
         return NextResponse.json({
             success: true,
-            message: 'Database connection successful',
-            data: {
-                userCount,
-                contentCount,
-                ratingCount,
-                sampleUser,
-                timestamp: new Date().toISOString()
+            userCount,
+            testUser: {
+                id: testUser.id,
+                email: testUser.email,
+                name: testUser.name,
+                role: testUser.role
             }
         });
 
     } catch (error) {
-        console.error('Database connection error:', error);
-
-        return NextResponse.json(
-            {
-                error: 'Database connection failed',
-                details: error instanceof Error ? error.message : 'Unknown error',
-                timestamp: new Date().toISOString()
-            },
-            { status: 500 }
-        );
+        console.error('Database test error:', error);
+        return NextResponse.json({
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+            stack: error instanceof Error ? error.stack : undefined
+        }, { status: 500 });
     }
 }
