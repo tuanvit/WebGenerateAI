@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom'
-import { TextEncoder, TextDecoder } from 'util'
+import { TextDecoder, TextEncoder } from 'util'
 
 // Polyfill for TextEncoder/TextDecoder
 global.TextEncoder = TextEncoder
@@ -100,8 +100,9 @@ global.IntersectionObserver = jest.fn().mockImplementation(() => ({
     observe: jest.fn(),
     unobserve: jest.fn(),
     disconnect: jest.fn(),
-}))// Mo
-ck global Response
+}));
+
+// Mock global Response
 global.Response = class MockResponse {
     body: any
     status: number

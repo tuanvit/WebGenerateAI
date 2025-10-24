@@ -47,9 +47,9 @@ export const AIToolSchema = z.object({
     features: z.array(z.string())
         .min(1, 'Phải có ít nhất một tính năng'),
     pricingModel: z.enum(['free', 'freemium', 'paid']),
-    integrationInstructions: z.string()
-        .max(1000, 'Hướng dẫn tích hợp không được quá 1000 ký tự')
-        .optional(),
+    integrationGuide: z.string()
+        .min(10, 'Hướng dẫn tích hợp phải có ít nhất 10 ký tự')
+        .max(1000, 'Hướng dẫn tích hợp không được quá 1000 ký tự'),
     samplePrompts: z.array(z.string())
         .optional(),
     relatedTools: z.array(z.string())

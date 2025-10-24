@@ -4,15 +4,14 @@
  */
 
 import { prisma } from '@/lib/db';
-import { AdminFilters, AdminPaginatedResponse, createPaginatedResponse } from '../index';
-import { AdminErrorCode, createAdminError } from '../admin-errors';
 import { adminConfig } from '../admin-config';
+import { AdminErrorCode, createAdminError } from '../admin-errors';
 import {
     OptimizedAIToolsQueries,
-    validatePagination,
     PerformanceMonitor,
-    QueryBuilder
+    validatePagination
 } from '../database-optimization';
+import { AdminFilters, AdminPaginatedResponse } from '../index';
 
 export interface AIToolData {
     id: string;
@@ -28,8 +27,8 @@ export interface AIToolData {
     features: string[];
     useCase: string;
     integrationGuide: string;
-    samplePrompts: string[];
-    relatedTools: string[];
+    samplePrompts?: string[];
+    relatedTools?: string[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -67,11 +66,14 @@ export class AIToolsRepository {
                     difficulty: filters.difficulty,
                     pricingModel: filters.pricingModel,
                     vietnameseSupport: filters.vietnameseSupport,
-                    ...paginationOptions
+                    page: paginationOptions.page,
+                    limit: paginationOptions.limit,
+                    sortBy: paginationOptions.sortBy || 'updatedAt',
+                    sortOrder: paginationOptions.sortOrder || 'desc'
                 });
 
                 // Transform data to match expected format
-                const transformedData = result.data.map(tool => ({
+                const transformedData = result.data.map((tool: any) => ({
                     id: tool.id,
                     name: tool.name,
                     description: tool.description,
@@ -84,7 +86,7 @@ export class AIToolsRepository {
                     pricingModel: tool.pricingModel,
                     features: JSON.parse(tool.features || '[]'),
                     useCase: tool.useCase,
-                    integrationGuide: tool.integrationGuide,
+                    integrationGuide: (tool as any).integrationInstructions || '',
                     samplePrompts: JSON.parse(tool.samplePrompts || '[]'),
                     relatedTools: JSON.parse(tool.relatedTools || '[]'),
                     createdAt: tool.createdAt,
@@ -93,7 +95,12 @@ export class AIToolsRepository {
 
                 return {
                     data: transformedData,
-                    pagination: result.pagination
+                    total: result.pagination.total,
+                    page: result.pagination.page,
+                    limit: result.pagination.limit,
+                    totalPages: result.pagination.totalPages,
+                    hasNext: result.pagination.hasNext,
+                    hasPrev: result.pagination.hasPrev
                 };
             } catch (error) {
                 console.error('Error in AIToolsRepository.getAITools:', error);
@@ -129,7 +136,7 @@ export class AIToolsRepository {
             });
 
             if (existing) {
-                throw createAdminError(AdminErrorCode.DUPLICATE_ENTRY, 'AI tool với tên này đã tồn tại');
+                throw createAdminError(AdminErrorCode.DUPLICATE_RECORD, 'AI tool với tên này đã tồn tại');
             }
 
             const tool = await prisma.aITool.create({
@@ -145,7 +152,7 @@ export class AIToolsRepository {
                     pricingModel: data.pricingModel,
                     features: JSON.stringify(data.features),
                     useCase: data.useCase,
-                    integrationGuide: data.integrationGuide,
+                    integrationInstructions: data.integrationGuide,
                     samplePrompts: JSON.stringify(data.samplePrompts || []),
                     relatedTools: JSON.stringify(data.relatedTools || [])
                 }
@@ -181,7 +188,7 @@ export class AIToolsRepository {
                 });
 
                 if (nameConflict) {
-                    throw createAdminError(AdminErrorCode.DUPLICATE_ENTRY, 'AI tool với tên này đã tồn tại');
+                    throw createAdminError(AdminErrorCode.DUPLICATE_RECORD, 'AI tool với tên này đã tồn tại');
                 }
             }
 
@@ -197,7 +204,7 @@ export class AIToolsRepository {
             if (data.pricingModel) updateData.pricingModel = data.pricingModel;
             if (data.features) updateData.features = JSON.stringify(data.features);
             if (data.useCase) updateData.useCase = data.useCase;
-            if (data.integrationGuide) updateData.integrationGuide = data.integrationGuide;
+            if (data.integrationGuide) updateData.integrationInstructions = data.integrationGuide;
             if (data.samplePrompts) updateData.samplePrompts = JSON.stringify(data.samplePrompts);
             if (data.relatedTools) updateData.relatedTools = JSON.stringify(data.relatedTools);
 
@@ -353,7 +360,7 @@ export class AIToolsRepository {
             pricingModel: tool.pricingModel,
             features: JSON.parse(tool.features || '[]'),
             useCase: tool.useCase,
-            integrationGuide: tool.integrationGuide,
+            integrationGuide: tool.integrationInstructions || '',
             samplePrompts: JSON.parse(tool.samplePrompts || '[]'),
             relatedTools: JSON.parse(tool.relatedTools || '[]'),
             createdAt: tool.createdAt,

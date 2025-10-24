@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { AIToolsService, AIToolSearchFilters } from '@/lib/admin/services/ai-tools-service';
 import { requireAdminAuth } from '@/lib/admin/admin-auth';
-import { AdminErrorCode, createAdminError } from '@/lib/admin/admin-errors';
 import { getCachedAITools, invalidateAIToolsCache } from '@/lib/admin/admin-cache';
+import { AdminErrorCode, createAdminError } from '@/lib/admin/admin-errors';
+import { AIToolSearchFilters, AIToolsService } from '@/lib/admin/services/ai-tools-service';
+import { NextRequest, NextResponse } from 'next/server';
 
 const aiToolsService = new AIToolsService();
 
@@ -33,11 +33,11 @@ export async function GET(request: NextRequest) {
         };
 
         // Validate pagination parameters
-        if (filters.page < 1) {
+        if (filters.page && filters.page < 1) {
             throw createAdminError(AdminErrorCode.INVALID_INPUT, 'Số trang phải lớn hơn 0');
         }
 
-        if (filters.limit < 1 || filters.limit > 100) {
+        if (filters.limit && (filters.limit < 1 || filters.limit > 100)) {
             throw createAdminError(AdminErrorCode.INVALID_INPUT, 'Kích thước trang phải từ 1 đến 100');
         }
 
@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json(
-            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_ERROR },
+            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_SERVER_ERROR },
             { status: 500 }
         );
     }
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
         }
 
         return NextResponse.json(
-            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_ERROR },
+            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_SERVER_ERROR },
             { status: 500 }
         );
     }
