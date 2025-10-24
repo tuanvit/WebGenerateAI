@@ -1,12 +1,14 @@
+import { AIToolSearchFilters, AIToolsService } from '@/lib/admin/services/ai-tools-service';
+import { AI_TOOLS_DATABASE } from '@/services/ai-tool-recommendation/ai-tools-data';
 import { NextRequest, NextResponse } from 'next/server';
-import { AI_TOOLS_DATABASE, getToolsByCategory, getToolsBySubject, getToolsByGradeLevel, getVietnameseSupportedTools, searchTools } from '@/services/ai-tool-recommendation/ai-tools-data';
-import { AIToolCategory } from '@/services/ai-tool-recommendation';
+
+const aiToolsService = new AIToolsService();
 
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
 
-        const category = searchParams.get('category') as AIToolCategory | null;
+        const category = searchParams.get('category');
         const subject = searchParams.get('subject');
         const gradeLevel = searchParams.get('gradeLevel');
         const vietnameseOnly = searchParams.get('vietnameseOnly') === 'true';
@@ -14,13 +16,49 @@ export async function GET(request: NextRequest) {
         const limit = searchParams.get('limit');
         const offset = searchParams.get('offset');
 
+        // Build filters for database query
+        const filters: AIToolSearchFilters = {
+            searchTerm: search || undefined,
+            categories: category && category !== 'all' ? [category] : undefined,
+            subjects: subject && subject !== 'all' ? [subject] : undefined,
+            gradeLevels: gradeLevel && gradeLevel !== 'all' ? [parseInt(gradeLevel)] : undefined,
+            vietnameseSupport: vietnameseOnly || undefined,
+            page: offset ? Math.floor(parseInt(offset) / (parseInt(limit || '10'))) + 1 : 1,
+            limit: limit ? parseInt(limit) : 100, // Default to 100 for user-facing API
+            sortBy: 'name',
+            sortOrder: 'asc'
+        };
+
+        // Try to get tools from database first
+        let result;
+        try {
+            result = await aiToolsService.getAITools(filters);
+
+            // If database has tools, use them
+            if (result.data && result.data.length > 0) {
+                return NextResponse.json({
+                    success: true,
+                    data: result.data,
+                    pagination: {
+                        total: result.total,
+                        count: result.data.length,
+                        limit: filters.limit,
+                        offset: offset ? parseInt(offset) : 0,
+                        page: result.page,
+                        totalPages: result.totalPages
+                    }
+                });
+            }
+        } catch (dbError) {
+            console.warn('Database query failed, falling back to static data:', dbError);
+        }
+
+        // Fallback to static data if database is empty or fails
         let tools = [...AI_TOOLS_DATABASE];
 
-        // Apply filters
+        // Apply filters to static data
         if (category && category !== 'all') {
-            // Convert string to AIToolCategory enum
-            const categoryEnum = category as AIToolCategory;
-            tools = getToolsByCategory(categoryEnum);
+            tools = tools.filter(tool => tool.category === category);
         }
 
         if (subject && subject !== 'all') {
@@ -29,8 +67,8 @@ export async function GET(request: NextRequest) {
 
         if (gradeLevel && gradeLevel !== 'all') {
             const grade = parseInt(gradeLevel);
-            if (!isNaN(grade)) {
-                tools = tools.filter(tool => tool.gradeLevel.includes(grade));
+            if (!isNaN(grade) && [6, 7, 8, 9].includes(grade)) {
+                tools = tools.filter(tool => tool.gradeLevel.includes(grade as 6 | 7 | 8 | 9));
             }
         }
 
@@ -39,21 +77,19 @@ export async function GET(request: NextRequest) {
         }
 
         if (search && search.trim()) {
-            const searchResults = searchTools(search);
-            tools = tools.filter(tool => searchResults.some(result => result.id === tool.id));
+            const searchLower = search.toLowerCase();
+            tools = tools.filter(tool =>
+                tool.name.toLowerCase().includes(searchLower) ||
+                tool.description.toLowerCase().includes(searchLower) ||
+                tool.useCase.toLowerCase().includes(searchLower)
+            );
         }
 
         // Apply pagination
         const totalCount = tools.length;
-
-        if (limit) {
-            const limitNum = parseInt(limit);
-            const offsetNum = offset ? parseInt(offset) : 0;
-
-            if (!isNaN(limitNum)) {
-                tools = tools.slice(offsetNum, offsetNum + limitNum);
-            }
-        }
+        const limitNum = limit ? parseInt(limit) : tools.length;
+        const offsetNum = offset ? parseInt(offset) : 0;
+        tools = tools.slice(offsetNum, offsetNum + limitNum);
 
         return NextResponse.json({
             success: true,
@@ -61,8 +97,8 @@ export async function GET(request: NextRequest) {
             pagination: {
                 total: totalCount,
                 count: tools.length,
-                limit: limit ? parseInt(limit) : null,
-                offset: offset ? parseInt(offset) : 0
+                limit: limitNum,
+                offset: offsetNum
             }
         });
 

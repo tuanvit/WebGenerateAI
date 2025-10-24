@@ -49,6 +49,48 @@ export default function CreatePromptPage() {
         'Công nghệ'
     ];
 
+    // Configuration for each output type
+    const outputTypeConfig = {
+        'lesson-plan': {
+            label: 'Giáo án',
+            icon: '📚',
+            buttonText: 'Tạo Prompt Giáo Án',
+            recommendedTools: ['chatgpt', 'gemini', 'copilot'],
+            description: 'Tạo giáo án chi tiết tuân thủ GDPT 2018'
+        },
+        'presentation': {
+            label: 'Bài thuyết trình',
+            icon: '📊',
+            buttonText: 'Tạo Prompt Thuyết Trình',
+            recommendedTools: ['gamma', 'canva', 'chatgpt'],
+            description: 'Tạo bài thuyết trình hấp dẫn và chuyên nghiệp'
+        },
+        'assessment': {
+            label: 'Đánh giá/Kiểm tra',
+            icon: '📝',
+            buttonText: 'Tạo Prompt Đánh Giá',
+            recommendedTools: ['chatgpt', 'gemini', 'copilot'],
+            description: 'Tạo câu hỏi và bài kiểm tra theo Bloom\'s Taxonomy'
+        },
+        'interactive': {
+            label: 'Hoạt động tương tác',
+            icon: '🎮',
+            buttonText: 'Tạo Prompt Hoạt Động',
+            recommendedTools: ['canva', 'gamma', 'chatgpt'],
+            description: 'Tạo hoạt động học tập tương tác và sáng tạo'
+        },
+        'research': {
+            label: 'Nghiên cứu',
+            icon: '🔬',
+            buttonText: 'Tạo Prompt Nghiên Cứu',
+            recommendedTools: ['chatgpt', 'gemini', 'copilot'],
+            description: 'Tạo đề cương và hướng dẫn nghiên cứu'
+        }
+    };
+
+    // Get current output type configuration
+    const currentConfig = outputTypeConfig[formData.outputType as keyof typeof outputTypeConfig] || outputTypeConfig['lesson-plan'];
+
 
 
     const handleInputChange = (field: keyof FormData, value: string | number) => {
@@ -310,13 +352,9 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                                 <span className="bg-blue-100 text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-sm">
-                                    {formData.outputType === 'lesson-plan' ? '📚' :
-                                        formData.outputType === 'presentation' ? '📊' :
-                                            formData.outputType === 'assessment' ? '📝' : '📋'}
+                                    {currentConfig.icon}
                                 </span>
-                                Thông tin {formData.outputType === 'lesson-plan' ? 'giáo án' :
-                                    formData.outputType === 'presentation' ? 'thuyết trình' :
-                                        formData.outputType === 'assessment' ? 'đánh giá' : 'nội dung'}
+                                Thông tin {currentConfig.label.toLowerCase()}
                             </h2>
 
                             <div className="space-y-4">
@@ -377,9 +415,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 {/* Lesson Name */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Chủ đề {formData.outputType === 'lesson-plan' ? 'giáo án' :
-                                            formData.outputType === 'presentation' ? 'thuyết trình' :
-                                                formData.outputType === 'assessment' ? 'đánh giá' : 'nội dung'} *
+                                        Chủ đề {currentConfig.label.toLowerCase()} *
                                     </label>
                                     <input
                                         type="text"
@@ -389,7 +425,8 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                             formData.outputType === 'lesson-plan' ? "Ví dụ: Phương trình bậc nhất một ẩn" :
                                                 formData.outputType === 'presentation' ? "Ví dụ: Giới thiệu về hình học" :
                                                     formData.outputType === 'assessment' ? "Ví dụ: Kiểm tra chương 1 - Đại số" :
-                                                        "Ví dụ: Chủ đề cần tạo nội dung"
+                                                        formData.outputType === 'interactive' ? "Ví dụ: Trò chơi học từ vựng" :
+                                                            "Ví dụ: Nghiên cứu về biến đổi khí hậu"
                                         }
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
@@ -398,9 +435,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 {/* Objectives */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Mục tiêu {formData.outputType === 'lesson-plan' ? 'bài học' :
-                                            formData.outputType === 'presentation' ? 'thuyết trình' :
-                                                formData.outputType === 'assessment' ? 'đánh giá' : 'nội dung'}
+                                        Mục tiêu {currentConfig.label.toLowerCase()}
                                     </label>
                                     <textarea
                                         value={formData.objectives}
@@ -409,7 +444,8 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                             formData.outputType === 'lesson-plan' ? "Mục tiêu kiến thức, kỹ năng, thái độ cần đạt được..." :
                                                 formData.outputType === 'presentation' ? "Mục tiêu truyền đạt thông tin, tương tác với khán giả..." :
                                                     formData.outputType === 'assessment' ? "Mục tiêu đánh giá kiến thức, kỹ năng của học sinh..." :
-                                                        "Mục tiêu cần đạt được..."
+                                                        formData.outputType === 'interactive' ? "Mục tiêu tương tác, kỹ năng thực hành cần đạt được..." :
+                                                            "Mục tiêu nghiên cứu, phát triển tư duy phản biện..."
                                         }
                                         rows={3}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -517,15 +553,15 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                                 </svg>
-                                                Đang tạo prompt giáo trình...
+                                                Đang tạo prompt...
                                             </span>
                                         ) : (
-                                            '📚 Tạo Prompt Giáo Trình'
+                                            `${currentConfig.icon} ${currentConfig.buttonText}`
                                         )}
                                     </button>
                                     {useTemplate && !selectedTemplate && (
                                         <p className="text-sm text-gray-500 text-center mt-2">
-                                            Chọn template ở trên hoặc tạo prompt giáo trình tự do
+                                            Chọn template ở trên hoặc tạo prompt tự do
                                         </p>
                                     )}
                                 </div>
@@ -647,14 +683,18 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                         {formData.subject && formData.grade >= 6 && formData.grade <= 9 && (
                             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                                    📚 Công cụ AI đề xuất cho tạo giáo trình
+                                    {currentConfig.icon} Công cụ AI đề xuất cho {currentConfig.label.toLowerCase()}
                                 </h3>
+                                <p className="text-sm text-gray-600 mb-4">
+                                    {currentConfig.description}
+                                </p>
                                 <AIToolSelector
                                     subject={formData.subject}
                                     gradeLevel={formData.grade as 6 | 7 | 8 | 9}
-                                    outputType="lesson-plan"
+                                    outputType={formData.outputType as 'lesson-plan' | 'presentation' | 'assessment'}
                                     onToolSelect={handleAIToolSelect}
                                     selectedTool={selectedAITool}
+                                    recommendedTools={currentConfig.recommendedTools}
                                 />
                             </div>
                         )}

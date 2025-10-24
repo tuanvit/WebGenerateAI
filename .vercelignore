@@ -1,0 +1,53 @@
+# Vercel Ignore File
+# Files and directories to ignore during deployment
+
+# Development files
+*.md
+!README.md
+!VERCEL_DEPLOYMENT.md
+
+# Test files
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+e2e/
+tests/
+__tests__/
+
+# Documentation
+docs/
+*.md
+!README.md
+!VERCEL_DEPLOYMENT.md
+
+# Local environment
+.env.local
+.env.development
+.env.test
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Scripts (if not needed)
+scripts/
+
+# Git
+.git/
+.gitignore
