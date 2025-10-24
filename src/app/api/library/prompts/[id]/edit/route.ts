@@ -10,9 +10,10 @@ const promptEditor = new PromptEditor();
  */
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession();
         if (!session?.user?.email) {
             return NextResponse.json(
@@ -22,7 +23,7 @@ export async function PUT(
         }
 
         const userId = (session.user as any).id || session.user.email!;
-        const promptId = params.id;
+        const promptId = id;
         const body = await request.json();
 
         const { content, createVersion = true } = body;

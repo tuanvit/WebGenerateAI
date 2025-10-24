@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { ContentModerationService, ModerationFlag } from '../../../../../../services/moderation/ContentModerationService';
+import { ContentModerationService } from '../../../../../../services/moderation/ContentModerationService';
+import { ModerationFlag } from '../../../../../../types/moderation';
 import { z } from 'zod';
 
 const ReportSchema = z.object({

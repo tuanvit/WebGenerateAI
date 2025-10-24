@@ -13,9 +13,10 @@ const updateUserSchema = z.object({
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user) {
@@ -26,7 +27,7 @@ export async function GET(
         }
 
         // Users can only access their own profile
-        if (session.user.id !== params.id) {
+        if (session.user.id !== id) {
             return NextResponse.json(
                 { error: "Không có quyền truy cập thông tin này" },
                 { status: 403 }
@@ -34,7 +35,7 @@ export async function GET(
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: params.id },
+            where: { id },
             select: {
                 id: true,
                 email: true,
@@ -66,9 +67,10 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user) {
@@ -79,7 +81,7 @@ export async function PUT(
         }
 
         // Users can only update their own profile
-        if (session.user.id !== params.id) {
+        if (session.user.id !== id) {
             return NextResponse.json(
                 { error: "Không có quyền cập nhật thông tin này" },
                 { status: 403 }
@@ -99,7 +101,7 @@ export async function PUT(
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 name: validatedData.name,
                 school: validatedData.school || null,

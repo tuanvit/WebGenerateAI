@@ -2,112 +2,77 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function SimpleAuth() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('admin@example.com');
+    const [name, setName] = useState('Admin User');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const router = useRouter();
 
-    const testAccounts = [
-        { email: 'giaovien@demo.com', name: 'Cô Nguyễn Thị Lan', role: 'Giáo viên' },
-        { email: 'thayminh@demo.com', name: 'Thầy Trần Văn Minh', role: 'Giáo viên' },
-        { email: 'admin@demo.com', name: 'Quản trị viên', role: 'Admin' }
-    ];
+    const handleSimpleLogin = async () => {
+        if (!email || !name) {
+            alert('Vui lòng nhập email và tên');
+            return;
+        }
 
-    const handleLogin = async (e: React.FormEvent) => {
-        e.preventDefault();
         setLoading(true);
-        setError('');
 
         try {
-            const response = await fetch('/api/simple-auth/login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
+            const result = await signIn('demo', {
+                email,
+                name,
+                redirect: false
             });
 
-            const data = await response.json();
-
-            if (response.ok) {
-                // Redirect to home page
-                window.location.href = '/';
+            if (result?.ok) {
+                // Chuyển hướng về admin dashboard nếu là admin
+                if (email === 'admin@example.com') {
+                    router.push('/admin/dashboard');
+                } else {
+                    router.push('/dashboard');
+                }
             } else {
-                setError(data.error || 'Đăng nhập thất bại');
+                alert('Đăng nhập thất bại: ' + (result?.error || 'Unknown error'));
             }
         } catch (error) {
-            console.error('Login error:', error);
-            setError('Có lỗi xảy ra khi đăng nhập');
+            console.error('Simple login error:', error);
+            alert('Có lỗi xảy ra khi đăng nhập');
         } finally {
             setLoading(false);
         }
     };
 
-    const quickLogin = (accountEmail: string) => {
-        setEmail(accountEmail);
-        setPassword('demo123');
-    };
-
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full space-y-8">
-                <div className="text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                        <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                    </div>
-                    <h2 className="text-4xl font-bold mb-2">
-                        <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-                            Đăng nhập nhanh
-                        </span>
+                <div>
+                    <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+                        Đăng nhập Đơn giản
                     </h2>
                     <p className="mt-2 text-center text-sm text-gray-600">
-                        Hệ thống đăng nhập đơn giản để test ứng dụng
+                        Đăng nhập nhanh chóng - không cần Google OAuth
                     </p>
                 </div>
 
-                {/* Quick Login Buttons */}
-                <div className="space-y-3">
-                    <h3 className="text-sm font-medium text-gray-700">Chọn tài khoản test:</h3>
-                    {testAccounts.map((account, index) => (
-                        <button
-                            key={index}
-                            onClick={() => quickLogin(account.email)}
-                            className="w-full flex items-center justify-between p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                            <div className="text-left">
-                                <div className="font-medium text-gray-900">{account.name}</div>
-                                <div className="text-sm text-gray-500">{account.email}</div>
-                            </div>
-                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                {account.role}
-                            </span>
-                        </button>
-                    ))}
-                </div>
-
-                <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                        <div className="w-full border-t border-gray-300" />
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                        <span className="px-2 bg-gray-50 text-gray-500">Hoặc nhập thủ công</span>
-                    </div>
-                </div>
-
-                {/* Manual Login Form */}
-                <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-                    {error && (
-                        <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                            <p className="text-sm text-red-600">{error}</p>
-                        </div>
-                    )}
-
+                <div className="mt-8 space-y-6">
                     <div className="space-y-4">
+                        <div>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                                Họ và tên
+                            </label>
+                            <input
+                                id="name"
+                                name="name"
+                                type="text"
+                                required
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
+                                placeholder="Nhập họ và tên của bạn"
+                            />
+                        </div>
+
                         <div>
                             <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                                 Email
@@ -120,34 +85,18 @@ export default function SimpleAuth() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Nhập email"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                                Mật khẩu
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                required
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                                placeholder="Nhập mật khẩu (demo123)"
+                                placeholder="Nhập email của bạn"
                             />
                         </div>
                     </div>
 
                     <div>
                         <button
-                            type="submit"
+                            onClick={handleSimpleLogin}
                             disabled={loading}
                             className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                            {loading ? 'Đang đăng nhập...' : 'Đăng nhập Đơn giản'}
                         </button>
                     </div>
 
@@ -159,15 +108,50 @@ export default function SimpleAuth() {
                             Quay lại đăng nhập Google
                         </a>
                     </div>
-                </form>
+                </div>
+
+                {/* Quick Login Presets */}
+                <div className="border-t border-gray-200 pt-6">
+                    <h3 className="text-sm font-medium text-gray-700 mb-3">Tài khoản test nhanh:</h3>
+                    <div className="space-y-2">
+                        <button
+                            onClick={() => {
+                                setEmail('admin@example.com');
+                                setName('Admin User');
+                            }}
+                            className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                        >
+                            <div className="font-medium text-gray-900">Admin User</div>
+                            <div className="text-sm text-gray-500">admin@example.com</div>
+                            <div className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded inline-block mt-1">
+                                Admin
+                            </div>
+                        </button>
+
+                        <button
+                            onClick={() => {
+                                setEmail('giaovien@demo.com');
+                                setName('Cô Nguyễn Thị Lan');
+                            }}
+                            className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                        >
+                            <div className="font-medium text-gray-900">Cô Nguyễn Thị Lan</div>
+                            <div className="text-sm text-gray-500">giaovien@demo.com</div>
+                            <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded inline-block mt-1">
+                                Giáo viên
+                            </div>
+                        </button>
+                    </div>
+                </div>
 
                 {/* Instructions */}
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                     <h4 className="font-medium text-blue-900 mb-2">💡 Hướng dẫn:</h4>
                     <ul className="text-sm text-blue-800 space-y-1">
                         <li>• Click vào tài khoản test để tự động điền thông tin</li>
-                        <li>• Mật khẩu cho tất cả tài khoản test: <code className="bg-blue-100 px-1 rounded">demo123</code></li>
-                        <li>• Sau khi đăng nhập, bạn có thể sử dụng đầy đủ tính năng</li>
+                        <li>• Không cần mật khẩu - chỉ cần email và tên</li>
+                        <li>• Admin có thể truy cập trang quản lý</li>
+                        <li>• Giáo viên có thể sử dụng tính năng tạo prompt</li>
                     </ul>
                 </div>
             </div>

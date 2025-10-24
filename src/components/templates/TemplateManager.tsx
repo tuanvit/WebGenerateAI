@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PromptTemplate } from '@/services/templates/SubjectTemplateService';
 import TemplateBrowser from './TemplateBrowser';
+import TemplatesList from './TemplatesList';
 
 interface TemplateManagerProps {
     onSelectTemplate?: (template: PromptTemplate) => void;
@@ -10,7 +11,7 @@ interface TemplateManagerProps {
     showCreateButton?: boolean;
 }
 
-type ViewMode = 'browse' | 'favorites' | 'recent' | 'create';
+type ViewMode = 'browse' | 'list' | 'favorites' | 'recent' | 'create';
 
 export default function TemplateManager({
     onSelectTemplate,
@@ -91,6 +92,14 @@ export default function TemplateManager({
                     />
                 );
 
+            case 'list':
+                return (
+                    <TemplatesList
+                        onSelectTemplate={handleSelectTemplate}
+                        showActions={true}
+                    />
+                );
+
             case 'favorites':
                 return (
                     <div className="space-y-4">
@@ -127,8 +136,8 @@ export default function TemplateManager({
                                             <button
                                                 onClick={() => toggleFavorite(template.id)}
                                                 className={`text-lg ${favoriteTemplates.includes(template.id)
-                                                        ? 'text-yellow-500'
-                                                        : 'text-gray-300 hover:text-yellow-500'
+                                                    ? 'text-yellow-500'
+                                                    : 'text-gray-300 hover:text-yellow-500'
                                                     }`}
                                             >
                                                 ⭐
@@ -270,6 +279,7 @@ export default function TemplateManager({
                 <nav className="-mb-px flex space-x-8">
                     {[
                         { key: 'browse', label: 'Duyệt templates', icon: '🔍' },
+                        { key: 'list', label: 'Danh sách', icon: '📋' },
                         { key: 'recent', label: 'Gần đây', icon: '🕒' },
                         { key: 'favorites', label: 'Yêu thích', icon: '⭐' },
                         ...(showCreateButton ? [{ key: 'create', label: 'Tạo mới', icon: '➕' }] : [])
@@ -278,8 +288,8 @@ export default function TemplateManager({
                             key={tab.key}
                             onClick={() => setViewMode(tab.key as ViewMode)}
                             className={`flex items-center py-2 px-1 border-b-2 font-medium text-sm ${viewMode === tab.key
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                 }`}
                         >
                             <span className="mr-2">{tab.icon}</span>

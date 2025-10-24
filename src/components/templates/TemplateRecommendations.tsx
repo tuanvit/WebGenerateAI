@@ -158,8 +158,8 @@ export default function TemplateRecommendations({
                     <div
                         key={match.template.id}
                         className={`border rounded-lg transition-all hover:shadow-md ${selectedTemplate?.id === match.template.id
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
                             }`}
                     >
                         <div
@@ -196,12 +196,12 @@ export default function TemplateRecommendations({
 
                             {/* Match Reasons */}
                             <div className="flex flex-wrap gap-1 mb-2">
-                                {match.reasons.slice(0, 3).map((reason, idx) => (
+                                {(match.reasons || []).slice(0, 3).map((reason, idx) => (
                                     <span key={idx} className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
                                         ✓ {reason}
                                     </span>
                                 ))}
-                                {match.reasons.length > 3 && (
+                                {(match.reasons || []).length > 3 && (
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -209,7 +209,7 @@ export default function TemplateRecommendations({
                                         }}
                                         className="text-xs text-blue-600 hover:text-blue-800"
                                     >
-                                        +{match.reasons.length - 3} lý do khác
+                                        +{(match.reasons || []).length - 3} lý do khác
                                     </button>
                                 )}
                             </div>
@@ -229,7 +229,7 @@ export default function TemplateRecommendations({
                                     Tại sao template này phù hợp:
                                 </h5>
                                 <div className="space-y-1">
-                                    {match.reasons.map((reason, idx) => (
+                                    {(match.reasons || []).map((reason, idx) => (
                                         <div key={idx} className="flex items-center text-xs text-gray-600">
                                             <span className="text-green-500 mr-2">✓</span>
                                             {reason}
@@ -248,7 +248,7 @@ export default function TemplateRecommendations({
                                     <div className="mt-1 w-full bg-gray-200 rounded-full h-2">
                                         <div
                                             className={`h-2 rounded-full ${match.score >= 60 ? 'bg-green-500' :
-                                                    match.score >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+                                                match.score >= 40 ? 'bg-yellow-500' : 'bg-red-500'
                                                 }`}
                                             style={{ width: `${Math.min(match.score, 100)}%` }}
                                         ></div>

@@ -22,8 +22,8 @@ export const TEST_ACCOUNTS: SimpleUser[] = [
     },
     {
         id: 'admin-1',
-        email: 'admin@demo.com',
-        name: 'Quản trị viên',
+        email: 'admin@example.com',
+        name: 'Admin User',
         role: 'admin'
     }
 ];

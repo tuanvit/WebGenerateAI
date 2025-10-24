@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 export default function DemoAuth() {
-    const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
+    const [email, setEmail] = useState('admin@example.com');
+    const [name, setName] = useState('Admin User');
     const router = useRouter();
 
     const handleDemoLogin = async () => {
@@ -15,20 +16,21 @@ export default function DemoAuth() {
         }
 
         try {
-            const response = await fetch('/api/auth/demo-login', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, name }),
+            const result = await signIn('demo', {
+                email,
+                name,
+                redirect: false
             });
 
-            if (response.ok) {
-                // Chuyển hướng về trang chủ
-                window.location.href = '/';
+            if (result?.ok) {
+                // Chuyển hướng về admin dashboard nếu là admin
+                if (email === 'admin@example.com') {
+                    router.push('/admin/dashboard');
+                } else {
+                    router.push('/dashboard');
+                }
             } else {
-                const error = await response.json();
-                alert(error.error || 'Đăng nhập thất bại');
+                alert('Đăng nhập thất bại: ' + (result?.error || 'Unknown error'));
             }
         } catch (error) {
             console.error('Demo login error:', error);

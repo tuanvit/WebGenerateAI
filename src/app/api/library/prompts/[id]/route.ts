@@ -16,9 +16,10 @@ function getUserId(session: any): string {
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession();
         if (!session?.user?.email) {
             return NextResponse.json(
@@ -28,7 +29,7 @@ export async function GET(
         }
 
         const userId = getUserId(session);
-        const promptId = params.id;
+        const promptId = id;
 
         // Get all user's prompts and find the specific one
         const prompts = await personalLibrary.getPrompts(userId);
@@ -67,9 +68,10 @@ export async function GET(
  */
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession();
         if (!session?.user?.email) {
             return NextResponse.json(
@@ -79,7 +81,7 @@ export async function PUT(
         }
 
         const userId = getUserId(session);
-        const promptId = params.id;
+        const promptId = id;
         const body = await request.json();
 
         const updatedPrompt = await personalLibrary.updatePrompt(promptId, body);
@@ -125,9 +127,10 @@ export async function PUT(
  */
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession();
         if (!session?.user?.email) {
             return NextResponse.json(
@@ -137,7 +140,7 @@ export async function DELETE(
         }
 
         const userId = getUserId(session);
-        const promptId = params.id;
+        const promptId = id;
 
         await personalLibrary.deletePrompt(promptId, userId);
 

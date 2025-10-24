@@ -213,7 +213,12 @@ export default function TemplateBrowser({
                             <div className="flex items-start justify-between mb-3">
                                 <div className="flex-1">
                                     <h4 className="font-semibold text-gray-900 mb-1">
-                                        {template.name}
+                                        <a
+                                            href={`/templates/${template.id}`}
+                                            className="hover:text-blue-600 hover:underline"
+                                        >
+                                            {template.name}
+                                        </a>
                                     </h4>
                                     <div className="flex items-center space-x-2 text-sm text-gray-600">
                                         <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded">

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { subjectTemplateService } from '@/services/templates/SubjectTemplateService';
+import { TemplatesService } from '@/lib/admin/services/templates-service';
 
 export async function GET(request: NextRequest) {
     try {
@@ -9,37 +9,75 @@ export async function GET(request: NextRequest) {
         const gradeLevel = searchParams.get('gradeLevel');
         const query = searchParams.get('q');
 
-        let templates;
+        // Map curriculum-creation to lesson-plan for backward compatibility
+        let mappedOutputType = outputType;
+        if (outputType === 'curriculum-creation') {
+            mappedOutputType = 'lesson-plan';
+        }
+
+        const templatesService = new TemplatesService();
+        let result;
 
         if (query) {
             // Search templates
-            templates = await subjectTemplateService.searchTemplates(query);
-        } else if (subject && gradeLevel && outputType) {
-            // Get recommended templates
-            templates = await subjectTemplateService.getRecommendedTemplates(
-                subject,
-                parseInt(gradeLevel),
-                outputType
-            );
-        } else if (subject) {
-            // Get templates by subject
-            templates = await subjectTemplateService.getTemplatesBySubject(subject);
-        } else if (outputType) {
-            // Get templates by output type
-            templates = await subjectTemplateService.getTemplatesByOutputType(outputType);
+            result = await templatesService.searchTemplates(query);
+            return NextResponse.json({
+                success: true,
+                templates: result.data,
+                meta: {
+                    count: result.data.length,
+                    total: result.total,
+                    filters: { subject, outputType, gradeLevel, query }
+                }
+            });
         } else {
-            // Get all templates if no filters provided
-            templates = await subjectTemplateService.getAllTemplates();
-        }
+            // Build filters for admin service
+            const filters: any = {
+                limit: 100 // Get more templates for user selection
+            };
 
-        return NextResponse.json({
-            success: true,
-            templates: templates,
-            meta: {
-                count: templates.length,
-                filters: { subject, outputType, gradeLevel, query }
+            if (subject) {
+                filters.subject = subject;
             }
-        });
+
+            if (mappedOutputType) {
+                filters.outputType = mappedOutputType;
+            }
+
+            if (gradeLevel) {
+                filters.gradeLevel = [parseInt(gradeLevel)];
+            }
+
+            // Get templates from admin service (database)
+            result = await templatesService.getTemplates(filters);
+
+            // Transform admin template format to user template format
+            const transformedTemplates = result.data.map(adminTemplate => ({
+                id: adminTemplate.id,
+                name: adminTemplate.name,
+                description: adminTemplate.description,
+                subject: adminTemplate.subject,
+                gradeLevel: adminTemplate.gradeLevel,
+                outputType: adminTemplate.outputType,
+                template: adminTemplate.templateContent,
+                variables: adminTemplate.variables || [],
+                examples: adminTemplate.examples || [],
+                tags: adminTemplate.tags || [],
+                difficulty: adminTemplate.difficulty,
+                compliance: adminTemplate.compliance || [],
+                recommendedTools: adminTemplate.recommendedTools || []
+            }));
+
+            return NextResponse.json({
+                success: true,
+                templates: transformedTemplates,
+                meta: {
+                    count: transformedTemplates.length,
+                    total: result.total,
+                    filters: { subject, outputType: mappedOutputType, gradeLevel, query }
+                }
+            });
+        }
     } catch (error) {
         console.error('Error fetching templates:', error);
         return NextResponse.json(

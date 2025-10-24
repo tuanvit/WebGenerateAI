@@ -10,9 +10,10 @@ const versionManager = new VersionManager();
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession();
         if (!session?.user?.email) {
             return NextResponse.json(
@@ -21,7 +22,7 @@ export async function GET(
             );
         }
 
-        const promptId = params.id;
+        const promptId = id;
 
         const versions = await versionManager.getVersionHistory(promptId);
 
@@ -51,9 +52,10 @@ export async function GET(
  */
 export async function POST(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession();
         if (!session?.user?.email) {
             return NextResponse.json(
@@ -62,7 +64,7 @@ export async function POST(
             );
         }
 
-        const promptId = params.id;
+        const promptId = id;
         const body = await request.json();
         const { content } = body;
 

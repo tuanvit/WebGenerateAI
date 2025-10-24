@@ -1,9 +1,13 @@
 import { PrismaClient } from '@prisma/client'
+import { runSeedOperations } from '../src/lib/admin/seed-data'
 
 const prisma = new PrismaClient()
 
 async function main() {
     console.log('Seeding database...')
+
+    // Seed admin system data first
+    await runSeedOperations('admin@example.com', 'Admin User')
 
     // Create sample users (Vietnamese teachers)
     const teacher1 = await prisma.user.upsert({
@@ -13,8 +17,8 @@ async function main() {
             email: 'nguyen.van.a@school.edu.vn',
             name: 'Nguyễn Văn A',
             school: 'THCS Lê Quý Đôn',
-            subjects: ['Toán học', 'Vật lý'],
-            gradeLevel: [6, 7, 8, 9],
+            subjects: JSON.stringify(['Toán học', 'Vật lý']),
+            gradeLevel: JSON.stringify([6, 7, 8, 9]),
         },
     })
 
@@ -25,8 +29,8 @@ async function main() {
             email: 'tran.thi.b@school.edu.vn',
             name: 'Trần Thị B',
             school: 'THCS Nguyễn Du',
-            subjects: ['Ngữ văn', 'Lịch sử'],
-            gradeLevel: [6, 7],
+            subjects: JSON.stringify(['Ngữ văn', 'Lịch sử']),
+            gradeLevel: JSON.stringify([6, 7]),
         },
     })
 
@@ -37,8 +41,8 @@ async function main() {
             email: 'le.van.c@school.edu.vn',
             name: 'Lê Văn C',
             school: 'THCS Trần Hưng Đạo',
-            subjects: ['Tiếng Anh', 'Địa lý'],
-            gradeLevel: [8, 9],
+            subjects: JSON.stringify(['Tiếng Anh', 'Địa lý']),
+            gradeLevel: JSON.stringify([8, 9]),
         },
     })
 
@@ -56,7 +60,7 @@ async function main() {
             },
             generatedText: 'Bạn là một giáo viên Toán học chuyên nghiệp. Hãy tạo một kế hoạch bài dạy 5 cột cho chủ đề "Phương trình bậc nhất một ẩn" dành cho học sinh lớp 7 theo chuẩn GDPT 2018...',
             targetTool: 'chatgpt',
-            tags: ['#Chuẩn5512', '#ToánHọc', '#Lớp7'],
+            tags: JSON.stringify(['#Chuẩn5512', '#ToánHọc', '#Lớp7']),
         },
     })
 
@@ -73,7 +77,7 @@ async function main() {
             },
             generatedText: 'Bạn là một giáo viên Ngữ văn có kinh nghiệm. Hãy tạo kế hoạch bài dạy 4 cột cho chủ đề "Tả người" dành cho học sinh lớp 6...',
             targetTool: 'gemini',
-            tags: ['#NgữVăn', '#TảNgười', '#Lớp6'],
+            tags: JSON.stringify(['#NgữVăn', '#TảNgười', '#Lớp6']),
         },
     })
 
@@ -103,7 +107,7 @@ async function main() {
             content: 'Kế hoạch bài dạy 5 cột theo chuẩn CV 5512...',
             subject: 'Toán học',
             gradeLevel: 7,
-            tags: ['#Chuẩn5512', '#ToánHọc', '#PhươngTrình', '#DạyHọcTíchCực'],
+            tags: JSON.stringify(['#Chuẩn5512', '#ToánHọc', '#PhươngTrình', '#DạyHọcTíchCực']),
             rating: 4.5,
             ratingCount: 12,
         },
@@ -117,7 +121,7 @@ async function main() {
             content: 'Slide 1: Giới thiệu về kỹ năng tả người...',
             subject: 'Ngữ văn',
             gradeLevel: 6,
-            tags: ['#NgữVăn', '#TảNgười', '#KỹNăng', '#SángTạo'],
+            tags: JSON.stringify(['#NgữVăn', '#TảNgười', '#KỹNăng', '#SángTạo']),
             rating: 4.2,
             ratingCount: 8,
         },

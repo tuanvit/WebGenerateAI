@@ -5,9 +5,10 @@ import { prisma } from "@/lib/db-utils"
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user?.email) {
@@ -33,7 +34,7 @@ export async function DELETE(
         const savedContent = await prisma.userLibrary.findFirst({
             where: {
                 userId: user.id,
-                contentId: params.id
+                contentId: id
             }
         })
 

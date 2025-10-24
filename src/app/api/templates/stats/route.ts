@@ -1,35 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SubjectTemplateService } from '@/services/templates/SubjectTemplateService';
+import { TemplatesService } from '@/lib/admin/services/templates-service';
 
 export async function GET(request: NextRequest) {
     try {
-        const templateService = new SubjectTemplateService();
-        const allTemplates = await templateService.getAllTemplates();
+        const templatesService = new TemplatesService();
 
-        // Calculate stats
+        // Get stats from admin service
+        const adminStats = await templatesService.getTemplatesStatistics();
+
+        // Transform to user-facing format
         const stats = {
-            totalTemplates: allTemplates.length,
-            bySubject: {} as Record<string, number>,
-            byOutputType: {} as Record<string, number>,
+            totalTemplates: adminStats.total,
+            bySubject: adminStats.bySubject,
+            byOutputType: adminStats.byOutputType,
             byGradeLevel: {} as Record<string, number>
         };
 
-        // Count by subject
-        allTemplates.forEach((template: any) => {
-            stats.bySubject[template.subject] = (stats.bySubject[template.subject] || 0) + 1;
-        });
-
-        // Count by output type
-        allTemplates.forEach((template: any) => {
-            stats.byOutputType[template.outputType] = (stats.byOutputType[template.outputType] || 0) + 1;
-        });
+        // Get all templates to calculate grade level stats
+        const allTemplatesResult = await templatesService.getTemplates({ limit: 1000 });
 
         // Count by grade level
-        allTemplates.forEach((template: any) => {
-            template.gradeLevel.forEach((grade: any) => {
-                const gradeKey = `grade-${grade}`;
-                stats.byGradeLevel[gradeKey] = (stats.byGradeLevel[gradeKey] || 0) + 1;
-            });
+        allTemplatesResult.data.forEach((template: any) => {
+            if (template.gradeLevel && Array.isArray(template.gradeLevel)) {
+                template.gradeLevel.forEach((grade: any) => {
+                    const gradeKey = `grade-${grade}`;
+                    stats.byGradeLevel[gradeKey] = (stats.byGradeLevel[gradeKey] || 0) + 1;
+                });
+            }
         });
 
         return NextResponse.json(stats);

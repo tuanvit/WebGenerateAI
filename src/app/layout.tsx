@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import SessionProvider from "@/components/providers/SessionProvider";
 import "./globals.css";
 
+// Initialize backup scheduler on server startup
+import "@/lib/admin/init-backup-scheduler";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

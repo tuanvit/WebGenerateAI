@@ -13,9 +13,10 @@ const updateUserSchema = z.object({
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { email: string } }
+    { params }: { params: Promise<{ email: string }> }
 ) {
     try {
+        const { email } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user) {
@@ -25,7 +26,7 @@ export async function GET(
             )
         }
 
-        const email = decodeURIComponent(params.email)
+        const email = decodeURIComponent(email)
 
         // Users can only access their own profile
         if (session.user.email !== email) {
@@ -91,9 +92,10 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { email: string } }
+    { params }: { params: Promise<{ email: string }> }
 ) {
     try {
+        const { email } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user) {
@@ -103,7 +105,7 @@ export async function PUT(
             )
         }
 
-        const email = decodeURIComponent(params.email)
+        const email = decodeURIComponent(email)
 
         // Users can only update their own profile
         if (session.user.email !== email) {

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '../../../../lib/db';
 
 export async function POST(request: NextRequest) {
     try {
@@ -12,41 +11,13 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // Tạo hoặc cập nhật user demo
-        const user = await prisma.user.upsert({
-            where: { email },
-            update: { name },
-            create: {
-                email,
-                name,
-                subjects: JSON.stringify(['Toán', 'Văn']), // Default subjects
-                gradeLevel: JSON.stringify([6, 7, 8, 9]), // Default grades
-            },
+        // Return success - the actual authentication will be handled by the client
+        // using NextAuth signIn with the demo provider
+        return NextResponse.json({
+            success: true,
+            message: 'Demo login data received',
+            data: { email, name }
         });
-
-        // Tạo session token đơn giản
-        const sessionToken = `demo-session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
-
-        await prisma.session.create({
-            data: {
-                sessionToken,
-                userId: user.id,
-                expires,
-            },
-        });
-
-        // Set cookie
-        const response = NextResponse.json({ success: true, user });
-        response.cookies.set('next-auth.session-token', sessionToken, {
-            expires,
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
-            path: '/',
-        });
-
-        return response;
     } catch (error) {
         console.error('Demo login error:', error);
         return NextResponse.json(

@@ -27,7 +27,7 @@ export default function CreatePromptPage() {
         grade: 6,
         lessonName: '',
         objectives: '',
-        outputType: 'curriculum-creation'
+        outputType: 'lesson-plan'
     });
 
     const [generatedPrompt, setGeneratedPrompt] = useState('');
@@ -259,10 +259,10 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                 {/* Header */}
                 <div className="text-center mb-10">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                        Tạo Prompt Giáo Trình
+                        Tạo Prompt Giáo Dục
                     </h1>
                     <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                        Hệ thống thông minh tạo prompt cho giáo trình và tài liệu giảng dạy tuân thủ GDPT 2018 và CV 5512
+                        Hệ thống thông minh tạo prompt cho giáo án, bài thuyết trình, đánh giá và tài liệu giảng dạy tuân thủ GDPT 2018 và CV 5512
                     </p>
                 </div>
 
@@ -273,9 +273,13 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                             <h2 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
                                 <span className="bg-blue-100 text-blue-600 w-8 h-8 rounded-lg flex items-center justify-center mr-3 text-sm">
-                                    📚
+                                    {formData.outputType === 'lesson-plan' ? '📚' :
+                                        formData.outputType === 'presentation' ? '📊' :
+                                            formData.outputType === 'assessment' ? '📝' : '📋'}
                                 </span>
-                                Thông tin giáo trình
+                                Thông tin {formData.outputType === 'lesson-plan' ? 'giáo án' :
+                                    formData.outputType === 'presentation' ? 'thuyết trình' :
+                                        formData.outputType === 'assessment' ? 'đánh giá' : 'nội dung'}
                             </h2>
 
                             <div className="space-y-4">
@@ -315,16 +319,41 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                     </div>
                                 </div>
 
+                                {/* Output Type */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Loại đầu ra
+                                    </label>
+                                    <select
+                                        value={formData.outputType}
+                                        onChange={(e) => handleInputChange('outputType', e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                    >
+                                        <option value="lesson-plan">📚 Giáo án</option>
+                                        <option value="presentation">📊 Bài thuyết trình</option>
+                                        <option value="assessment">📝 Đánh giá/Kiểm tra</option>
+                                        <option value="interactive">🎮 Hoạt động tương tác</option>
+                                        <option value="research">🔬 Nghiên cứu</option>
+                                    </select>
+                                </div>
+
                                 {/* Lesson Name */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Chủ đề giáo trình *
+                                        Chủ đề {formData.outputType === 'lesson-plan' ? 'giáo án' :
+                                            formData.outputType === 'presentation' ? 'thuyết trình' :
+                                                formData.outputType === 'assessment' ? 'đánh giá' : 'nội dung'} *
                                     </label>
                                     <input
                                         type="text"
                                         value={formData.lessonName}
                                         onChange={(e) => handleInputChange('lessonName', e.target.value)}
-                                        placeholder="Ví dụ: Phương trình bậc nhất một ẩn, Văn học dân gian Việt Nam"
+                                        placeholder={
+                                            formData.outputType === 'lesson-plan' ? "Ví dụ: Phương trình bậc nhất một ẩn" :
+                                                formData.outputType === 'presentation' ? "Ví dụ: Giới thiệu về hình học" :
+                                                    formData.outputType === 'assessment' ? "Ví dụ: Kiểm tra chương 1 - Đại số" :
+                                                        "Ví dụ: Chủ đề cần tạo nội dung"
+                                        }
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
                                 </div>
@@ -332,12 +361,19 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 {/* Objectives */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                                        Mục tiêu giáo trình
+                                        Mục tiêu {formData.outputType === 'lesson-plan' ? 'bài học' :
+                                            formData.outputType === 'presentation' ? 'thuyết trình' :
+                                                formData.outputType === 'assessment' ? 'đánh giá' : 'nội dung'}
                                     </label>
                                     <textarea
                                         value={formData.objectives}
                                         onChange={(e) => handleInputChange('objectives', e.target.value)}
-                                        placeholder="Mục tiêu kiến thức, kỹ năng, thái độ cần đạt được qua giáo trình..."
+                                        placeholder={
+                                            formData.outputType === 'lesson-plan' ? "Mục tiêu kiến thức, kỹ năng, thái độ cần đạt được..." :
+                                                formData.outputType === 'presentation' ? "Mục tiêu truyền đạt thông tin, tương tác với khán giả..." :
+                                                    formData.outputType === 'assessment' ? "Mục tiêu đánh giá kiến thức, kỹ năng của học sinh..." :
+                                                        "Mục tiêu cần đạt được..."
+                                        }
                                         rows={3}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     />
@@ -579,7 +615,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 <AIToolSelector
                                     subject={formData.subject}
                                     gradeLevel={formData.grade as 6 | 7 | 8 | 9}
-                                    outputType="curriculum-creation"
+                                    outputType="lesson-plan"
                                     onToolSelect={handleAIToolSelect}
                                     selectedTool={selectedAITool}
                                 />

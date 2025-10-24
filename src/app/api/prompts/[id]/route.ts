@@ -13,9 +13,10 @@ const updatePromptSchema = z.object({
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user?.email) {
@@ -39,7 +40,7 @@ export async function GET(
 
         const prompt = await prisma.generatedPrompt.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: user.id
             },
             select: {
@@ -84,9 +85,10 @@ export async function GET(
 
 export async function PUT(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user?.email) {
@@ -111,7 +113,7 @@ export async function PUT(
         // Verify prompt belongs to user
         const existingPrompt = await prisma.generatedPrompt.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: user.id
             }
         })
@@ -132,7 +134,7 @@ export async function PUT(
         if (validatedData.isShared !== undefined) updateData.isShared = validatedData.isShared
 
         const updatedPrompt = await prisma.generatedPrompt.update({
-            where: { id: params.id },
+            where: { id: id },
             data: updateData,
             select: {
                 id: true,
@@ -176,9 +178,10 @@ export async function PUT(
 
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user?.email) {
@@ -203,7 +206,7 @@ export async function DELETE(
         // Verify prompt belongs to user
         const existingPrompt = await prisma.generatedPrompt.findFirst({
             where: {
-                id: params.id,
+                id: id,
                 userId: user.id
             }
         })
@@ -217,7 +220,7 @@ export async function DELETE(
 
         // Delete the prompt
         await prisma.generatedPrompt.delete({
-            where: { id: params.id }
+            where: { id: id }
         })
 
         return NextResponse.json({ message: "Đã xóa prompt thành công" })
