@@ -1,97 +1,127 @@
-import { requireAdminAuth } from '@/lib/admin/admin-auth';
-import { getCachedAITools, invalidateAIToolsCache } from '@/lib/admin/admin-cache';
-import { AdminErrorCode, createAdminError } from '@/lib/admin/admin-errors';
-import { AIToolSearchFilters, AIToolsService } from '@/lib/admin/services/ai-tools-service';
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-const aiToolsService = new AIToolsService();
+const prisma = new PrismaClient();
 
-/**
- * GET /api/admin/ai-tools
- * Get AI tools with filtering, sorting, and pagination
- */
 export async function GET(request: NextRequest) {
     try {
-        // Require admin authentication - TEMPORARILY BYPASSED FOR TESTING
-        // const user = await requireAdminAuth(request);
-
         const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page') || '1');
+        const limit = parseInt(searchParams.get('limit') || '25');
+        const sortBy = searchParams.get('sortBy') || 'updatedAt';
+        const sortOrder = (searchParams.get('sortOrder') || 'desc') as 'asc' | 'desc';
+        const search = searchParams.get('search') || undefined;
+        const category = searchParams.get('category') || undefined;
 
-        // Parse query parameters
-        const filters: AIToolSearchFilters = {
-            searchTerm: searchParams.get('search') || undefined,
-            categories: searchParams.get('category') ? [searchParams.get('category')!] : undefined,
-            subjects: searchParams.get('subject') ? [searchParams.get('subject')!] : undefined,
-            gradeLevels: searchParams.get('gradeLevel') ? [parseInt(searchParams.get('gradeLevel')!)] : undefined,
-            difficulties: searchParams.get('difficulty') ? [searchParams.get('difficulty')!] : undefined,
-            pricingModels: searchParams.get('pricingModel') ? [searchParams.get('pricingModel')!] : undefined,
-            vietnameseSupport: searchParams.get('vietnameseSupport') ? searchParams.get('vietnameseSupport') === 'true' : undefined,
-            page: parseInt(searchParams.get('page') || '1'),
-            limit: parseInt(searchParams.get('limit') || '25'),
-            sortBy: searchParams.get('sortBy') || 'updatedAt',
-            sortOrder: (searchParams.get('sortOrder') as 'asc' | 'desc') || 'desc'
-        };
+        const skip = (page - 1) * limit;
 
-        // Validate pagination parameters
-        if (filters.page && filters.page < 1) {
-            throw createAdminError(AdminErrorCode.INVALID_INPUT, 'Số trang phải lớn hơn 0');
+        // Build where clause
+        const where: any = {};
+
+        if (search) {
+            where.OR = [
+                { name: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } }
+            ];
         }
 
-        if (filters.limit && (filters.limit < 1 || filters.limit > 100)) {
-            throw createAdminError(AdminErrorCode.INVALID_INPUT, 'Kích thước trang phải từ 1 đến 100');
+        if (category) {
+            where.category = category;
         }
 
-        // Get AI tools using cache
-        const result = await getCachedAITools(filters);
+        const [aiTools, total] = await Promise.all([
+            prisma.aITool.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { [sortBy]: sortOrder }
+            }),
+            prisma.aITool.count({ where })
+        ]);
 
-        return NextResponse.json(result);
+        // Transform data to parse JSON strings back to arrays
+        const transformedTools = aiTools.map(tool => ({
+            ...tool,
+            subjects: JSON.parse(tool.subjects || '[]'),
+            gradeLevel: JSON.parse(tool.gradeLevel || '[]'),
+            features: JSON.parse(tool.features || '[]'),
+            samplePrompts: tool.samplePrompts ? JSON.parse(tool.samplePrompts) : [],
+            relatedTools: tool.relatedTools ? JSON.parse(tool.relatedTools) : []
+        }));
+
+        const totalPages = Math.ceil(total / limit);
+
+        return NextResponse.json({
+            data: transformedTools,
+            total,
+            page,
+            limit,
+            totalPages,
+            hasNext: page < totalPages,
+            hasPrev: page > 1
+        });
     } catch (error) {
         console.error('Error in GET /api/admin/ai-tools:', error);
-
-        if (error instanceof Error && 'statusCode' in error) {
-            return NextResponse.json(
-                { error: error.message, code: (error as any).code },
-                { status: (error as any).statusCode }
-            );
-        }
-
         return NextResponse.json(
-            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_SERVER_ERROR },
+            { error: 'Không thể tải danh sách AI tools' },
             { status: 500 }
         );
     }
 }
 
-/**
- * POST /api/admin/ai-tools
- * Create new AI tool
- */
 export async function POST(request: NextRequest) {
     try {
-        // Require admin authentication
-        const user = await requireAdminAuth(request);
+        const toolData = await request.json();
 
-        const body = await request.json();
+        console.log('Received AI tool data:', JSON.stringify(toolData, null, 2));
 
-        // Create AI tool
-        const aiTool = await aiToolsService.createAITool(body, user);
-
-        // Invalidate cache after creation
-        invalidateAIToolsCache();
-
-        return NextResponse.json(aiTool, { status: 201 });
-    } catch (error) {
-        console.error('Error in POST /api/admin/ai-tools:', error);
-
-        if (error instanceof Error && 'statusCode' in error) {
+        // Basic validation
+        if (!toolData.name || !toolData.description || !toolData.url || !toolData.category) {
             return NextResponse.json(
-                { error: error.message, code: (error as any).code },
-                { status: (error as any).statusCode }
+                { error: 'Thiếu thông tin bắt buộc: name, description, url, category' },
+                { status: 400 }
             );
         }
 
+        // Ensure arrays are properly formatted
+        const processedData = {
+            name: toolData.name,
+            description: toolData.description,
+            url: toolData.url,
+            category: toolData.category,
+            subjects: JSON.stringify(toolData.subjects || []),
+            gradeLevel: JSON.stringify(toolData.gradeLevel || []),
+            useCase: toolData.useCase || '',
+            vietnameseSupport: Boolean(toolData.vietnameseSupport),
+            difficulty: toolData.difficulty || 'beginner',
+            features: JSON.stringify(toolData.features || []),
+            pricingModel: toolData.pricingModel || 'free',
+            integrationInstructions: toolData.integrationInstructions || null,
+            samplePrompts: JSON.stringify(toolData.samplePrompts || []),
+            relatedTools: JSON.stringify(toolData.relatedTools || [])
+        };
+
+        console.log('Processed data for database:', JSON.stringify(processedData, null, 2));
+
+        const aiTool = await prisma.aITool.create({
+            data: processedData
+        });
+
+        // Transform data to parse JSON strings back to arrays for response
+        const transformedTool = {
+            ...aiTool,
+            subjects: JSON.parse(aiTool.subjects || '[]'),
+            gradeLevel: JSON.parse(aiTool.gradeLevel || '[]'),
+            features: JSON.parse(aiTool.features || '[]'),
+            samplePrompts: aiTool.samplePrompts ? JSON.parse(aiTool.samplePrompts) : [],
+            relatedTools: aiTool.relatedTools ? JSON.parse(aiTool.relatedTools) : []
+        };
+
+        return NextResponse.json(transformedTool, { status: 201 });
+    } catch (error) {
+        console.error('Error in POST /api/admin/ai-tools:', error);
         return NextResponse.json(
-            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_SERVER_ERROR },
+            { error: 'Không thể tạo AI tool mới: ' + (error instanceof Error ? error.message : 'Unknown error') },
             { status: 500 }
         );
     }

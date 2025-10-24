@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { AIToolDetails, AIToolCategory } from '@/services/ai-tool-recommendation';
-import { AI_TOOLS_DATABASE } from '@/services/ai-tool-recommendation/ai-tools-data';
 import Link from 'next/link';
 
 interface AIToolsBrowserWithFiltersProps {
@@ -24,17 +23,54 @@ export default function AIToolsBrowserWithFilters({
     const [displayLimit, setDisplayLimit] = useState(initialLimit);
     const [loading, setLoading] = useState(true);
 
-    // Lấy danh sách unique subjects và grades
-    const allSubjects = Array.from(new Set(AI_TOOLS_DATABASE.flatMap(tool => tool.subjects)));
-    const allGrades = Array.from(new Set(AI_TOOLS_DATABASE.flatMap(tool => tool.gradeLevel))).sort();
+    // Lấy danh sách unique subjects và grades từ tools đã load
+    const allSubjects = Array.from(new Set(tools.flatMap(tool => tool.subjects)));
+    const allGrades = Array.from(new Set(tools.flatMap(tool => tool.gradeLevel))).sort();
 
     useEffect(() => {
-        // Simulate loading
-        setTimeout(() => {
-            setTools(AI_TOOLS_DATABASE);
-            setFilteredTools(AI_TOOLS_DATABASE.slice(0, initialLimit));
-            setLoading(false);
-        }, 500);
+        const loadAITools = async () => {
+            setLoading(true);
+            try {
+                const response = await fetch('/api/ai-tools');
+                if (response.ok) {
+                    const aiTools = await response.json();
+
+                    // Transform database format to AIToolDetails format
+                    const transformedTools: AIToolDetails[] = aiTools.map((tool: any) => ({
+                        id: tool.id,
+                        name: tool.name,
+                        description: tool.description,
+                        url: tool.url,
+                        category: tool.category as AIToolCategory,
+                        subjects: tool.subjects,
+                        gradeLevel: tool.gradeLevel,
+                        useCase: tool.useCase,
+                        vietnameseSupport: tool.vietnameseSupport,
+                        difficulty: tool.difficulty,
+                        features: tool.features,
+                        pricingModel: tool.pricingModel,
+                        integrationInstructions: tool.integrationInstructions || '',
+                        samplePrompts: tool.samplePrompts || [],
+                        relatedTools: tool.relatedTools || []
+                    }));
+
+                    setTools(transformedTools);
+                    setFilteredTools(transformedTools.slice(0, initialLimit));
+                } else {
+                    console.error('Failed to load AI tools');
+                    setTools([]);
+                    setFilteredTools([]);
+                }
+            } catch (error) {
+                console.error('Error loading AI tools:', error);
+                setTools([]);
+                setFilteredTools([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        loadAITools();
     }, [initialLimit]);
 
     useEffect(() => {
@@ -408,8 +444,8 @@ export default function AIToolsBrowserWithFilters({
                                         Lớp {tool.gradeLevel.join(', ')}
                                     </span>
                                     <span className={`text-xs px-2 py-1 rounded ${tool.pricingModel === 'free' ? 'bg-green-100 text-green-800' :
-                                            tool.pricingModel === 'freemium' ? 'bg-blue-100 text-blue-800' :
-                                                'bg-gray-100 text-gray-800'
+                                        tool.pricingModel === 'freemium' ? 'bg-blue-100 text-blue-800' :
+                                            'bg-gray-100 text-gray-800'
                                         }`}>
                                         {tool.pricingModel === 'free' ? 'Miễn phí' :
                                             tool.pricingModel === 'freemium' ? 'Freemium' : 'Trả phí'}

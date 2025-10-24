@@ -14,7 +14,7 @@ import {
 import { AdminFilters, AdminPaginatedResponse } from '../index';
 
 export interface AIToolData {
-    id: string;
+    id?: string;
     name: string;
     description: string;
     url: string;
@@ -26,11 +26,11 @@ export interface AIToolData {
     pricingModel: string;
     features: string[];
     useCase: string;
-    integrationGuide: string;
+    integrationInstructions?: string;
     samplePrompts?: string[];
     relatedTools?: string[];
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface AIToolFilters extends AdminFilters {

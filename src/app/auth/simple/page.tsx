@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
 export default function SimpleAuth() {
-    const [email, setEmail] = useState('admin@example.com');
-    const [name, setName] = useState('Admin User');
+    const [email, setEmail] = useState('');
+    const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -110,50 +110,7 @@ export default function SimpleAuth() {
                     </div>
                 </div>
 
-                {/* Quick Login Presets */}
-                <div className="border-t border-gray-200 pt-6">
-                    <h3 className="text-sm font-medium text-gray-700 mb-3">Tài khoản test nhanh:</h3>
-                    <div className="space-y-2">
-                        <button
-                            onClick={() => {
-                                setEmail('admin@example.com');
-                                setName('Admin User');
-                            }}
-                            className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                            <div className="font-medium text-gray-900">Admin User</div>
-                            <div className="text-sm text-gray-500">admin@example.com</div>
-                            <div className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded inline-block mt-1">
-                                Admin
-                            </div>
-                        </button>
 
-                        <button
-                            onClick={() => {
-                                setEmail('giaovien@demo.com');
-                                setName('Cô Nguyễn Thị Lan');
-                            }}
-                            className="w-full text-left p-3 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                        >
-                            <div className="font-medium text-gray-900">Cô Nguyễn Thị Lan</div>
-                            <div className="text-sm text-gray-500">giaovien@demo.com</div>
-                            <div className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded inline-block mt-1">
-                                Giáo viên
-                            </div>
-                        </button>
-                    </div>
-                </div>
-
-                {/* Instructions */}
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                    <h4 className="font-medium text-blue-900 mb-2">💡 Hướng dẫn:</h4>
-                    <ul className="text-sm text-blue-800 space-y-1">
-                        <li>• Click vào tài khoản test để tự động điền thông tin</li>
-                        <li>• Không cần mật khẩu - chỉ cần email và tên</li>
-                        <li>• Admin có thể truy cập trang quản lý</li>
-                        <li>• Giáo viên có thể sử dụng tính năng tạo prompt</li>
-                    </ul>
-                </div>
             </div>
         </div>
     );

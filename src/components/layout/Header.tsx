@@ -159,9 +159,9 @@ export default function Header() {
                                 <div className="flex items-center space-x-3">
                                     <Link
                                         href="/auth/simple"
-                                        className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all duration-200 shadow-sm"
+                                        className="bg-gradient-to-r  from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-green-600 hover:to-emerald-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-200 shadow-sm"
                                     >
-                                        🚀 Trang admin
+                                        🔐 Đăng nhập tới trang Admin
                                     </Link>
                                     <Link
                                         href="/auth/signin"
@@ -253,10 +253,10 @@ export default function Header() {
                                     <div className="space-y-2">
                                         <Link
                                             href="/auth/simple"
-                                            className="block bg-green-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors"
+                                            className="block bg-orange-600 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors"
                                             onClick={() => setIsMenuOpen(false)}
                                         >
-                                            Đăng nhập nhanh
+                                            🔐 Đăng nhập tới trang Admin
                                         </Link>
                                         <Link
                                             href="/auth/signin"

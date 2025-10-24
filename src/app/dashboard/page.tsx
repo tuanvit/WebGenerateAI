@@ -2,10 +2,47 @@
 
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Header from "@/components/layout/Header"
 import Link from "next/link"
 import AIToolsBrowserWithFilters from "@/components/ai-tools/AIToolsBrowserWithFilters"
+
+// Component to display AI tools count from database
+function AIToolsStatsCard() {
+    const [toolsCount, setToolsCount] = useState(0)
+
+    useEffect(() => {
+        const fetchToolsCount = async () => {
+            try {
+                const response = await fetch('/api/ai-tools')
+                if (response.ok) {
+                    const tools = await response.json()
+                    setToolsCount(tools.length)
+                }
+            } catch (error) {
+                console.error('Error fetching tools count:', error)
+            }
+        }
+
+        fetchToolsCount()
+    }, [])
+
+    return (
+        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
+            <div className="flex items-center">
+                <div className="flex-shrink-0">
+                    <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <div className="ml-4">
+                    <p className="text-green-100">Công cụ AI</p>
+                    <p className="text-2xl font-bold">{toolsCount > 0 ? toolsCount : '...'}</p>
+                </div>
+            </div>
+        </div>
+    )
+}
 
 export default function Dashboard() {
     const { data: session, status } = useSession()
@@ -221,19 +258,7 @@ export default function Dashboard() {
                         </div>
                     </div>
 
-                    <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-6 text-white">
-                        <div className="flex items-center">
-                            <div className="flex-shrink-0">
-                                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                                </svg>
-                            </div>
-                            <div className="ml-4">
-                                <p className="text-green-100">Công cụ AI</p>
-                                <p className="text-2xl font-bold">35+</p>
-                            </div>
-                        </div>
-                    </div>
+                    <AIToolsStatsCard />
 
                     <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-6 text-white">
                         <div className="flex items-center">
