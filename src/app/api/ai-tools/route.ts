@@ -1,114 +1,79 @@
-import { AIToolSearchFilters, AIToolsService } from '@/lib/admin/services/ai-tools-service';
-import { AI_TOOLS_DATABASE } from '@/services/ai-tool-recommendation/ai-tools-data';
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
 
-const aiToolsService = new AIToolsService();
+const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
-
         const category = searchParams.get('category');
         const subject = searchParams.get('subject');
         const gradeLevel = searchParams.get('gradeLevel');
-        const vietnameseOnly = searchParams.get('vietnameseOnly') === 'true';
-        const search = searchParams.get('search');
-        const limit = searchParams.get('limit');
-        const offset = searchParams.get('offset');
+        const name = searchParams.get('name');
 
-        // Build filters for database query
-        const filters: AIToolSearchFilters = {
-            searchTerm: search || undefined,
-            categories: category && category !== 'all' ? [category] : undefined,
-            subjects: subject && subject !== 'all' ? [subject] : undefined,
-            gradeLevels: gradeLevel && gradeLevel !== 'all' ? [parseInt(gradeLevel)] : undefined,
-            vietnameseSupport: vietnameseOnly || undefined,
-            page: offset ? Math.floor(parseInt(offset) / (parseInt(limit || '10'))) + 1 : 1,
-            limit: limit ? parseInt(limit) : 100, // Default to 100 for user-facing API
-            sortBy: 'name',
-            sortOrder: 'asc'
-        };
+        let whereClause: any = {};
 
-        // Try to get tools from database first
-        let result;
-        try {
-            result = await aiToolsService.getAITools(filters);
-
-            // If database has tools, use them
-            if (result.data && result.data.length > 0) {
-                return NextResponse.json({
-                    success: true,
-                    data: result.data,
-                    pagination: {
-                        total: result.total,
-                        count: result.data.length,
-                        limit: filters.limit,
-                        offset: offset ? parseInt(offset) : 0,
-                        page: result.page,
-                        totalPages: result.totalPages
-                    }
-                });
-            }
-        } catch (dbError) {
-            console.warn('Database query failed, falling back to static data:', dbError);
+        // Filter by name if provided (for template recommendations)
+        if (name) {
+            whereClause.name = {
+                contains: name,
+                mode: 'insensitive'
+            };
         }
 
-        // Fallback to static data if database is empty or fails
-        let tools = [...AI_TOOLS_DATABASE];
-
-        // Apply filters to static data
-        if (category && category !== 'all') {
-            tools = tools.filter(tool => tool.category === category);
+        // Filter by category if provided
+        if (category) {
+            whereClause.category = category;
         }
 
-        if (subject && subject !== 'all') {
-            tools = tools.filter(tool => tool.subjects.includes(subject));
+        // Filter by subject if provided
+        if (subject) {
+            whereClause.subjects = {
+                contains: subject
+            };
         }
 
-        if (gradeLevel && gradeLevel !== 'all') {
-            const grade = parseInt(gradeLevel);
-            if (!isNaN(grade) && [6, 7, 8, 9].includes(grade)) {
-                tools = tools.filter(tool => tool.gradeLevel.includes(grade as 6 | 7 | 8 | 9));
-            }
+        // Filter by grade level if provided
+        if (gradeLevel) {
+            whereClause.gradeLevel = {
+                contains: gradeLevel
+            };
         }
 
-        if (vietnameseOnly) {
-            tools = tools.filter(tool => tool.vietnameseSupport);
-        }
-
-        if (search && search.trim()) {
-            const searchLower = search.toLowerCase();
-            tools = tools.filter(tool =>
-                tool.name.toLowerCase().includes(searchLower) ||
-                tool.description.toLowerCase().includes(searchLower) ||
-                tool.useCase.toLowerCase().includes(searchLower)
-            );
-        }
-
-        // Apply pagination
-        const totalCount = tools.length;
-        const limitNum = limit ? parseInt(limit) : tools.length;
-        const offsetNum = offset ? parseInt(offset) : 0;
-        tools = tools.slice(offsetNum, offsetNum + limitNum);
-
-        return NextResponse.json({
-            success: true,
-            data: tools,
-            pagination: {
-                total: totalCount,
-                count: tools.length,
-                limit: limitNum,
-                offset: offsetNum
+        const aiTools = await prisma.aITool.findMany({
+            where: whereClause,
+            select: {
+                id: true,
+                name: true,
+                description: true,
+                url: true,
+                category: true,
+                subjects: true,
+                gradeLevel: true,
+                useCase: true,
+                vietnameseSupport: true,
+                difficulty: true,
+                features: true,
+                pricingModel: true
+            },
+            orderBy: {
+                name: 'asc'
             }
         });
 
+        // Parse JSON fields
+        const processedTools = aiTools.map(tool => ({
+            ...tool,
+            subjects: JSON.parse(tool.subjects),
+            gradeLevel: JSON.parse(tool.gradeLevel),
+            features: JSON.parse(tool.features)
+        }));
+
+        return NextResponse.json(processedTools);
     } catch (error) {
         console.error('Error fetching AI tools:', error);
         return NextResponse.json(
-            {
-                success: false,
-                error: 'Không thể tải danh sách công cụ AI'
-            },
+            { error: 'Không thể tải danh sách AI tools' },
             { status: 500 }
         );
     }

@@ -12,6 +12,8 @@ interface AIToolSelectorProps {
     onToolSelect: (tool: AITool) => void;
     selectedTool?: AITool | null;
     recommendedTools?: string[]; // Array of tool IDs or names to prioritize
+    templateRecommendedTools?: string[]; // AI tools from selected template
+    useTemplateRecommendations?: boolean; // Whether to use template recommendations
 }
 
 export default function AIToolSelector({
@@ -20,7 +22,9 @@ export default function AIToolSelector({
     outputType,
     onToolSelect,
     selectedTool,
-    recommendedTools
+    recommendedTools,
+    templateRecommendedTools,
+    useTemplateRecommendations = false
 }: AIToolSelectorProps) {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [selectedToolForDetails, setSelectedToolForDetails] = useState<string | null>(null);
@@ -70,10 +74,32 @@ export default function AIToolSelector({
         if (subject && gradeLevel) {
             fetchQuickTools();
         }
-    }, [subject, gradeLevel, outputType, recommendedTools]);
+    }, [subject, gradeLevel, outputType, recommendedTools, templateRecommendedTools, useTemplateRecommendations]);
 
     const fetchQuickTools = async () => {
         try {
+            // If using template recommendations, fetch tools by name from template
+            if (useTemplateRecommendations && templateRecommendedTools && templateRecommendedTools.length > 0) {
+                const toolsPromises = templateRecommendedTools.map(async (toolName) => {
+                    try {
+                        const response = await fetch(`/api/ai-tools?name=${encodeURIComponent(toolName)}`);
+                        const result = await response.json();
+                        return result.length > 0 ? result[0] : null;
+                    } catch (error) {
+                        console.error(`Error fetching tool ${toolName}:`, error);
+                        return null;
+                    }
+                });
+
+                const templateTools = await Promise.all(toolsPromises);
+                const validTools = templateTools.filter(tool => tool !== null);
+
+                if (validTools.length > 0) {
+                    setQuickTools(validTools.slice(0, 3));
+                    return;
+                }
+            }
+
             // Special handling for curriculum creation
             if (outputType === 'curriculum-creation') {
                 const response = await fetch(`/api/ai-tools/curriculum?subject=${encodeURIComponent(subject)}&gradeLevel=${gradeLevel}&limit=6`);
@@ -206,7 +232,12 @@ export default function AIToolSelector({
             <div>
                 <div className="flex items-center justify-between mb-3">
                     <h3 className="text-sm font-medium text-gray-700">
-                        {outputType === 'curriculum-creation' ? 'Công cụ AI đề xuất cho tạo giáo trình' : 'Công cụ AI đề xuất cho giáo án'}
+                        {useTemplateRecommendations
+                            ? '🎯 Công cụ AI từ template đã chọn'
+                            : outputType === 'curriculum-creation'
+                                ? 'Công cụ AI đề xuất cho tạo giáo trình'
+                                : 'Công cụ AI đề xuất cho giáo án'
+                        }
                     </h3>
                     <button
                         onClick={() => setShowRecommendations(true)}

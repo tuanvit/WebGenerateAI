@@ -48,11 +48,26 @@ export class TemplatesService {
      */
     async createTemplate(data: TemplateData, userId: string): Promise<TemplateData> {
         try {
-            // TEMPORARY: Skip validation for testing
-            const validatedData = data;
+            // Basic validation
+            if (!data.name || !data.description || !data.subject || !data.templateContent) {
+                throw createAdminError(AdminErrorCode.VALIDATION_ERROR, 'Thiếu thông tin bắt buộc');
+            }
+
+            if (data.gradeLevel.length === 0) {
+                throw createAdminError(AdminErrorCode.VALIDATION_ERROR, 'Phải chọn ít nhất một lớp');
+            }
+
+            if (data.templateContent.length < 50) {
+                throw createAdminError(AdminErrorCode.VALIDATION_ERROR, 'Nội dung template phải có ít nhất 50 ký tự');
+            }
+
+            // Validate grade levels are within allowed range (6-9)
+            if (data.gradeLevel.some(grade => grade < 6 || grade > 9)) {
+                throw createAdminError(AdminErrorCode.VALIDATION_ERROR, 'Lớp học phải trong khoảng 6-9');
+            }
 
             // Create template using repository
-            const template = await this.repository.createTemplate(validatedData);
+            const template = await this.repository.createTemplate(data);
             console.log('Created template:', template.id);
 
             // Log admin action - TEMPORARILY DISABLED FOR TESTING

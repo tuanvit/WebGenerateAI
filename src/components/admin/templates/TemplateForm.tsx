@@ -100,6 +100,9 @@ export default function TemplateForm({
     const [activeTab, setActiveTab] = useState('basic');
     const [previewMode, setPreviewMode] = useState(false);
     const [previewVariables, setPreviewVariables] = useState<Record<string, string>>({});
+    const [availableAITools, setAvailableAITools] = useState<Array<{ id: string, name: string }>>([]);
+    const [loadingAITools, setLoadingAITools] = useState(false);
+    const [tagsInputValue, setTagsInputValue] = useState('');
 
     // Initialize form data
     useEffect(() => {
@@ -110,6 +113,9 @@ export default function TemplateForm({
                 examples: template.examples || []
             });
 
+            // Initialize tags input value
+            setTagsInputValue(template.tags?.join(', ') || '');
+
             // Initialize preview variables with default values
             const defaultVars: Record<string, string> = {};
             template.variables?.forEach(variable => {
@@ -118,6 +124,63 @@ export default function TemplateForm({
             setPreviewVariables(defaultVars);
         }
     }, [template]);
+
+    // Load AI tools
+    useEffect(() => {
+        const loadAITools = async () => {
+            setLoadingAITools(true);
+            try {
+                const response = await fetch('/api/ai-tools');
+                if (response.ok) {
+                    const tools = await response.json();
+                    setAvailableAITools(tools.map((tool: any) => ({
+                        id: tool.id,
+                        name: tool.name
+                    })));
+                }
+            } catch (error) {
+                console.error('Error loading AI tools:', error);
+            } finally {
+                setLoadingAITools(false);
+            }
+        };
+
+        loadAITools();
+    }, []);
+
+    // Load recommended AI tools when subject/grade/output type changes
+    useEffect(() => {
+        const loadRecommendedTools = async () => {
+            if (!formData.subject || formData.gradeLevel.length === 0 || !formData.outputType) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/templates/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        subject: formData.subject,
+                        gradeLevel: formData.gradeLevel[0], // Use first grade level
+                        outputType: formData.outputType
+                    })
+                });
+
+                if (response.ok) {
+                    const recommendedTools = await response.json();
+                    // Auto-select recommended tools if no tools are currently selected
+                    if (!formData.recommendedTools || formData.recommendedTools.length === 0) {
+                        const toolNames = recommendedTools.slice(0, 3).map((tool: any) => tool.name);
+                        handleRecommendedToolsChange(toolNames);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading recommended tools:', error);
+            }
+        };
+
+        loadRecommendedTools();
+    }, [formData.subject, formData.gradeLevel, formData.outputType]);
 
     // Handle basic field changes
     const handleFieldChange = (field: keyof TemplateData, value: any) => {
@@ -155,14 +218,19 @@ export default function TemplateForm({
 
     // Handle tags input
     const handleTagsChange = (tagsString: string) => {
-        const tags = tagsString.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
+        setTagsInputValue(tagsString);
+
+        // Split by comma, semicolon, or newline and clean up
+        const tags = tagsString
+            .split(/[,;\n]/)
+            .map(tag => tag.trim())
+            .filter(tag => tag.length > 0);
         setFormData(prev => ({ ...prev, tags }));
     };
 
-    // Handle recommended tools input
-    const handleRecommendedToolsChange = (toolsString: string) => {
-        const tools = toolsString.split(',').map(tool => tool.trim()).filter(tool => tool.length > 0);
-        setFormData(prev => ({ ...prev, recommendedTools: tools }));
+    // Handle recommended tools selection
+    const handleRecommendedToolsChange = (selectedTools: string[]) => {
+        setFormData(prev => ({ ...prev, recommendedTools: selectedTools }));
     };
 
     // Add new variable
@@ -204,10 +272,20 @@ export default function TemplateForm({
 
     // Add new example
     const addExample = () => {
+        // Initialize sampleInput with default values from variables
+        const initialSampleInput: Record<string, any> = {};
+        formData.variables?.forEach(variable => {
+            if (variable.type === 'multiselect') {
+                initialSampleInput[variable.name] = [];
+            } else {
+                initialSampleInput[variable.name] = variable.defaultValue || '';
+            }
+        });
+
         const newExample: TemplateExampleData = {
             title: '',
             description: '',
-            sampleInput: {},
+            sampleInput: initialSampleInput,
             expectedOutput: ''
         };
 
@@ -512,23 +590,69 @@ export default function TemplateForm({
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="tags">Tags (phân cách bằng dấu phẩy)</Label>
-                                        <Input
+                                        <Label htmlFor="tags">Tags</Label>
+                                        <p className="text-sm text-gray-600 mb-2">
+                                            Phân cách bằng dấu phẩy (,), chấm phẩy (;) hoặc xuống dòng
+                                        </p>
+                                        <Textarea
                                             id="tags"
-                                            value={formData.tags?.join(', ') || ''}
+                                            value={tagsInputValue}
                                             onChange={(e) => handleTagsChange(e.target.value)}
-                                            placeholder="tag1, tag2, tag3"
+                                            placeholder="CV5512, GDPT2018, NăngLựcToánHọc&#10;TưDuyLogic, PhươngTrìnhBậcNhất"
+                                            rows={3}
                                         />
+                                        {formData.tags && formData.tags.length > 0 && (
+                                            <div className="flex flex-wrap gap-1 mt-2">
+                                                {formData.tags.map((tag, index) => (
+                                                    <Badge key={index} variant="secondary" className="text-xs">
+                                                        {tag}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div>
-                                        <Label htmlFor="recommendedTools">Công cụ AI khuyến nghị (phân cách bằng dấu phẩy)</Label>
-                                        <Input
-                                            id="recommendedTools"
-                                            value={formData.recommendedTools?.join(', ') || ''}
-                                            onChange={(e) => handleRecommendedToolsChange(e.target.value)}
-                                            placeholder="ChatGPT, Gemini, Copilot"
-                                        />
+                                        <Label htmlFor="recommendedTools">Công cụ AI khuyến nghị</Label>
+                                        <p className="text-sm text-gray-600 mb-2">
+                                            Chọn các công cụ AI phù hợp từ danh sách có sẵn
+                                        </p>
+                                        {loadingAITools ? (
+                                            <div className="text-sm text-gray-500">Đang tải danh sách AI tools...</div>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-32 overflow-y-auto border rounded p-2">
+                                                    {availableAITools.map(tool => (
+                                                        <div key={tool.id} className="flex items-center space-x-2">
+                                                            <Checkbox
+                                                                id={`tool-${tool.id}`}
+                                                                checked={formData.recommendedTools?.includes(tool.name) || false}
+                                                                onCheckedChange={(checked) => {
+                                                                    const currentTools = formData.recommendedTools || [];
+                                                                    if (checked) {
+                                                                        handleRecommendedToolsChange([...currentTools, tool.name]);
+                                                                    } else {
+                                                                        handleRecommendedToolsChange(currentTools.filter(t => t !== tool.name));
+                                                                    }
+                                                                }}
+                                                            />
+                                                            <Label htmlFor={`tool-${tool.id}`} className="text-sm">
+                                                                {tool.name}
+                                                            </Label>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                {formData.recommendedTools && formData.recommendedTools.length > 0 && (
+                                                    <div className="flex flex-wrap gap-1">
+                                                        {formData.recommendedTools.map((tool, index) => (
+                                                            <Badge key={index} variant="outline" className="text-xs">
+                                                                {tool}
+                                                            </Badge>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        )}
                                     </div>
 
                                     <div>
@@ -776,29 +900,161 @@ export default function TemplateForm({
                                                     </div>
 
                                                     <div>
-                                                        <Label>Dữ liệu mẫu (JSON)</Label>
-                                                        <Textarea
-                                                            value={JSON.stringify(example.sampleInput, null, 2)}
-                                                            onChange={(e) => {
-                                                                try {
-                                                                    const parsed = JSON.parse(e.target.value);
-                                                                    updateExample(index, 'sampleInput', parsed);
-                                                                } catch {
-                                                                    // Invalid JSON, keep the text for user to fix
-                                                                }
-                                                            }}
-                                                            placeholder='{"bien1": "gia_tri1", "bien2": "gia_tri2"}'
-                                                            rows={4}
-                                                            className="font-mono"
-                                                        />
+                                                        <Label>Dữ liệu mẫu</Label>
+                                                        <p className="text-sm text-gray-600 mb-3">
+                                                            Nhập giá trị mẫu cho các biến đã định nghĩa
+                                                        </p>
+
+                                                        {formData.variables && formData.variables.length > 0 ? (
+                                                            <div className="space-y-3 p-4 bg-gray-50 rounded-lg">
+                                                                {formData.variables.map((variable, varIndex) => (
+                                                                    <div key={varIndex}>
+                                                                        <Label className="text-sm font-medium">
+                                                                            {variable.label}
+                                                                            {variable.required && <span className="text-red-500 ml-1">*</span>}
+                                                                        </Label>
+                                                                        {variable.description && (
+                                                                            <p className="text-xs text-gray-500 mb-1">{variable.description}</p>
+                                                                        )}
+
+                                                                        {variable.type === 'text' && (
+                                                                            <Input
+                                                                                value={example.sampleInput[variable.name] || ''}
+                                                                                onChange={(e) => {
+                                                                                    const newSampleInput = {
+                                                                                        ...example.sampleInput,
+                                                                                        [variable.name]: e.target.value
+                                                                                    };
+                                                                                    updateExample(index, 'sampleInput', newSampleInput);
+                                                                                }}
+                                                                                placeholder={variable.placeholder || `Nhập ${variable.label.toLowerCase()}`}
+                                                                                className="text-sm"
+                                                                            />
+                                                                        )}
+
+                                                                        {variable.type === 'textarea' && (
+                                                                            <Textarea
+                                                                                value={example.sampleInput[variable.name] || ''}
+                                                                                onChange={(e) => {
+                                                                                    const newSampleInput = {
+                                                                                        ...example.sampleInput,
+                                                                                        [variable.name]: e.target.value
+                                                                                    };
+                                                                                    updateExample(index, 'sampleInput', newSampleInput);
+                                                                                }}
+                                                                                placeholder={variable.placeholder || `Nhập ${variable.label.toLowerCase()}`}
+                                                                                rows={2}
+                                                                                className="text-sm"
+                                                                            />
+                                                                        )}
+
+                                                                        {variable.type === 'select' && (
+                                                                            <Select
+                                                                                value={example.sampleInput[variable.name] || ''}
+                                                                                onValueChange={(value) => {
+                                                                                    const newSampleInput = {
+                                                                                        ...example.sampleInput,
+                                                                                        [variable.name]: value
+                                                                                    };
+                                                                                    updateExample(index, 'sampleInput', newSampleInput);
+                                                                                }}
+                                                                            >
+                                                                                <SelectTrigger className="text-sm">
+                                                                                    <SelectValue placeholder={`Chọn ${variable.label.toLowerCase()}`} />
+                                                                                </SelectTrigger>
+                                                                                <SelectContent>
+                                                                                    {variable.options?.map(option => (
+                                                                                        <SelectItem key={option} value={option}>
+                                                                                            {option}
+                                                                                        </SelectItem>
+                                                                                    ))}
+                                                                                </SelectContent>
+                                                                            </Select>
+                                                                        )}
+
+                                                                        {variable.type === 'multiselect' && (
+                                                                            <div className="space-y-2">
+                                                                                <div className="grid grid-cols-2 gap-2">
+                                                                                    {variable.options?.map(option => (
+                                                                                        <div key={option} className="flex items-center space-x-2">
+                                                                                            <Checkbox
+                                                                                                id={`${index}-${varIndex}-${option}`}
+                                                                                                checked={
+                                                                                                    Array.isArray(example.sampleInput[variable.name])
+                                                                                                        ? example.sampleInput[variable.name].includes(option)
+                                                                                                        : false
+                                                                                                }
+                                                                                                onCheckedChange={(checked) => {
+                                                                                                    const currentValues = Array.isArray(example.sampleInput[variable.name])
+                                                                                                        ? example.sampleInput[variable.name]
+                                                                                                        : [];
+
+                                                                                                    const newValues = checked
+                                                                                                        ? [...currentValues, option]
+                                                                                                        : currentValues.filter(v => v !== option);
+
+                                                                                                    const newSampleInput = {
+                                                                                                        ...example.sampleInput,
+                                                                                                        [variable.name]: newValues
+                                                                                                    };
+                                                                                                    updateExample(index, 'sampleInput', newSampleInput);
+                                                                                                }}
+                                                                                            />
+                                                                                            <Label htmlFor={`${index}-${varIndex}-${option}`} className="text-sm">
+                                                                                                {option}
+                                                                                            </Label>
+                                                                                        </div>
+                                                                                    ))}
+                                                                                </div>
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                ))}
+
+                                                                {/* JSON Preview */}
+                                                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                                                    <Label className="text-xs text-gray-500">JSON Preview:</Label>
+                                                                    <div className="mt-1 p-2 bg-white border rounded text-xs font-mono text-gray-600">
+                                                                        {JSON.stringify(example.sampleInput, null, 2)}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                                                <p className="text-sm text-yellow-700">
+                                                                    ⚠️ Vui lòng tạo biến ở tab "Biến" trước khi tạo ví dụ
+                                                                </p>
+                                                            </div>
+                                                        )}
                                                     </div>
 
                                                     <div>
-                                                        <Label>Kết quả mong đợi *</Label>
+                                                        <div className="flex items-center justify-between mb-2">
+                                                            <Label>Kết quả mong đợi *</Label>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => {
+                                                                    // Auto-generate expected output by replacing variables in template content
+                                                                    let generatedOutput = formData.templateContent;
+                                                                    Object.entries(example.sampleInput).forEach(([key, value]) => {
+                                                                        const regex = new RegExp(`{{${key}}}`, 'g');
+                                                                        const displayValue = Array.isArray(value) ? value.join(', ') : value;
+                                                                        generatedOutput = generatedOutput.replace(regex, displayValue || `[${key}]`);
+                                                                    });
+                                                                    updateExample(index, 'expectedOutput', generatedOutput);
+                                                                }}
+                                                                className="text-xs"
+                                                            >
+                                                                <Eye className="h-3 w-3 mr-1" />
+                                                                Tự động tạo
+                                                            </Button>
+                                                        </div>
                                                         <Textarea
                                                             value={example.expectedOutput}
                                                             onChange={(e) => updateExample(index, 'expectedOutput', e.target.value)}
-                                                            placeholder="Kết quả sau khi thay thế biến"
+                                                            placeholder="Kết quả sau khi thay thế biến (có thể dùng nút 'Tự động tạo' ở trên)"
                                                             rows={6}
                                                             className={errors[`example_${index}_output`] ? 'border-red-500' : ''}
                                                         />

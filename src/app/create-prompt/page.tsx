@@ -686,7 +686,10 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                     {currentConfig.icon} Công cụ AI đề xuất cho {currentConfig.label.toLowerCase()}
                                 </h3>
                                 <p className="text-sm text-gray-600 mb-4">
-                                    {currentConfig.description}
+                                    {selectedTemplate && useTemplate
+                                        ? `Các công cụ AI được khuyến nghị cho template "${selectedTemplate.name}"`
+                                        : currentConfig.description
+                                    }
                                 </p>
                                 <AIToolSelector
                                     subject={formData.subject}
@@ -695,6 +698,8 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                     onToolSelect={handleAIToolSelect}
                                     selectedTool={selectedAITool}
                                     recommendedTools={currentConfig.recommendedTools}
+                                    templateRecommendedTools={selectedTemplate?.recommendedTools}
+                                    useTemplateRecommendations={useTemplate && !!selectedTemplate}
                                 />
                             </div>
                         )}
