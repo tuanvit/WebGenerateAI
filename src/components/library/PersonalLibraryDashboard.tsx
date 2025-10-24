@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { useSession } from 'next-auth/react'
-import { GeneratedPrompt } from '@/types/prompt'
-import { VIETNAMESE_SUBJECTS, GRADE_LEVELS } from '@/types/user'
 import { PromptDisplay } from '@/components/display'
+import { GeneratedPrompt } from '@/types/prompt'
+import { GRADE_LEVELS, VIETNAMESE_SUBJECTS } from '@/types/user'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 
 interface LibraryFilters {
     subject?: string
@@ -149,8 +149,8 @@ export default function PersonalLibraryDashboard({
 
             switch (filters.sortBy) {
                 case 'date':
-                    aValue = new Date(a.createdAt || a.savedAt || a.sortDate).getTime()
-                    bValue = new Date(b.createdAt || b.savedAt || b.sortDate).getTime()
+                    aValue = new Date(a.createdAt || a.savedAt || a.sortDate || new Date()).getTime()
+                    bValue = new Date(b.createdAt || b.savedAt || b.sortDate || new Date()).getTime()
                     break
                 case 'subject':
                     aValue = a.subject || (a.inputParameters as any)?.subject || ''
@@ -161,8 +161,8 @@ export default function PersonalLibraryDashboard({
                     bValue = b.gradeLevel || (b.inputParameters as any)?.gradeLevel || 0
                     break
                 default:
-                    aValue = new Date(a.createdAt || a.savedAt || a.sortDate).getTime()
-                    bValue = new Date(b.createdAt).getTime()
+                    aValue = new Date(a.createdAt || a.savedAt || a.sortDate || new Date()).getTime()
+                    bValue = new Date(b.createdAt || b.savedAt || b.sortDate || new Date()).getTime()
             }
 
             if (filters.sortOrder === 'asc') {
@@ -381,9 +381,9 @@ export default function PersonalLibraryDashboard({
                             </button>
 
                             <div className="flex space-x-2">
-                                {onEdit && (
+                                {onEdit && selectedPrompt.inputParameters && (
                                     <button
-                                        onClick={() => onEdit(selectedPrompt)}
+                                        onClick={() => onEdit(selectedPrompt as any)}
                                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                                     >
                                         <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -406,7 +406,7 @@ export default function PersonalLibraryDashboard({
                         </div>
 
                         <PromptDisplay
-                            prompt={selectedPrompt}
+                            prompt={selectedPrompt as any}
                             showActions={false}
                         />
                     </div>
@@ -452,7 +452,7 @@ export default function PersonalLibraryDashboard({
                                             {getPromptType(prompt)}
                                         </span>
                                         <span className="text-xs text-gray-500">
-                                            {new Date(prompt.createdAt || prompt.savedAt || prompt.sortDate).toLocaleDateString('vi-VN')}
+                                            {new Date(prompt.createdAt || prompt.savedAt || prompt.sortDate || new Date()).toLocaleDateString('vi-VN')}
                                         </span>
                                     </div>
 
@@ -466,7 +466,7 @@ export default function PersonalLibraryDashboard({
 
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-wrap gap-1">
-                                            {prompt.tags.slice(0, 2).map((tag, index) => (
+                                            {prompt.tags && prompt.tags.slice(0, 2).map((tag, index) => (
                                                 <span
                                                     key={index}
                                                     className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800"
@@ -474,7 +474,7 @@ export default function PersonalLibraryDashboard({
                                                     {tag}
                                                 </span>
                                             ))}
-                                            {prompt.tags.length > 2 && (
+                                            {prompt.tags && prompt.tags.length > 2 && (
                                                 <span className="text-xs text-gray-500">
                                                     +{prompt.tags.length - 2}
                                                 </span>
@@ -482,11 +482,11 @@ export default function PersonalLibraryDashboard({
                                         </div>
 
                                         <div className="flex space-x-1">
-                                            {onEdit && (
+                                            {onEdit && prompt.inputParameters && (
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation()
-                                                        onEdit(prompt)
+                                                        onEdit(prompt as any)
                                                     }}
                                                     className="p-1 text-gray-400 hover:text-blue-600"
                                                     title="Chỉnh sửa"

@@ -1,14 +1,14 @@
 'use client';
 
-import { useState } from 'react';
 import { FileUpload } from '@/components/forms/FileUpload';
 import { PromptDisplay } from '@/components/forms/PromptDisplay';
+import { useState } from 'react';
 // import { AIToolButtons } from '@/components/integration/AIToolButtons';
-import PromptEditor from '@/components/prompt/PromptEditor';
 import AIToolSelector from '@/components/ai-tools/AIToolSelector';
-import TemplateSelector from '@/components/templates/TemplateSelector';
-import TemplateRenderer from '@/components/templates/TemplateRenderer';
+import PromptEditor from '@/components/prompt/PromptEditor';
 import TemplateBrowser from '@/components/templates/TemplateBrowser';
+import TemplateRenderer from '@/components/templates/TemplateRenderer';
+import TemplateSelector from '@/components/templates/TemplateSelector';
 import { AITool } from '@/services/ai-tool-recommendation';
 import { PromptTemplate } from '@/services/templates/SubjectTemplateService';
 
@@ -173,20 +173,33 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
             const result = await response.json();
             if (result.success) {
                 alert('✅ Đã lưu prompt vào thư viện cá nhân!');
+                return result.data?.id; // Return the saved prompt ID
             } else {
                 alert('❌ Lỗi khi lưu prompt: ' + result.error);
+                return null;
             }
         } catch (error) {
             console.error('Error saving prompt:', error);
             alert('❌ Lỗi kết nối khi lưu prompt');
+            return null;
         }
     };
 
     const handleShareToCommunity = async () => {
-        if (!generatedPrompt) return;
+        if (!generatedPrompt) {
+            alert('❌ Chưa có prompt để chia sẻ');
+            return;
+        }
+
+        // Validate required fields
+        if (!formData.subject || !formData.grade || formData.grade < 6 || formData.grade > 9) {
+            alert('❌ Thông tin môn học hoặc khối lớp không hợp lệ (yêu cầu lớp 6-9)');
+            return;
+        }
 
         try {
-            const response = await fetch('/api/community/share', {
+            // Step 1: Save to personal library first to get promptId
+            const saveResponse = await fetch('/api/library/prompts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -195,23 +208,47 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                     subject: formData.subject,
                     gradeLevel: formData.grade,
                     outputType: formData.outputType,
+                    inputParameters: formData,
+                    templateId: selectedTemplate?.id,
+                    templateVariables: templateVariables
+                }),
+            });
+
+            const saveResult = await saveResponse.json();
+            if (!saveResult.success || !saveResult.data?.id) {
+                alert('❌ Lỗi khi lưu prompt: ' + (saveResult.error || 'Không có ID'));
+                return;
+            }
+
+            const promptId = saveResult.data.id;
+
+            // Step 2: Share to community using the promptId
+            const shareResponse = await fetch('/api/community/share', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    promptId: promptId,
+                    title: formData.lessonName || 'Prompt không có tiêu đề',
+                    description: formData.objectives || `Prompt ${formData.outputType} cho ${formData.subject} lớp ${formData.grade}`,
+                    subject: formData.subject,
+                    gradeLevel: formData.grade,
                     tags: [
                         '#GDPT2018',
                         '#CV5512',
                         `#${formData.subject}`,
                         `#Lớp${formData.grade}`,
                         selectedTemplate ? '#Template' : '#TựDo'
-                    ],
-                    inputParameters: formData,
-                    templateId: selectedTemplate?.id
+                    ]
                 }),
             });
 
-            const result = await response.json();
-            if (result.success) {
-                alert('🌍 Đã chia sẻ prompt lên cộng đồng!');
+            const shareResult = await shareResponse.json();
+
+            if (shareResponse.ok) {
+                alert('🌍 Đã chia sẻ prompt lên cộng đồng thành công!');
             } else {
-                alert('❌ Lỗi khi chia sẻ: ' + result.error);
+                alert('❌ Lỗi khi chia sẻ: ' + (shareResult.error || shareResult.details || 'Unknown error'));
+                console.error('Share error:', shareResult);
             }
         } catch (error) {
             console.error('Error sharing prompt:', error);

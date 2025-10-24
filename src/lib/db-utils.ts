@@ -2,6 +2,9 @@
  * Database utilities for SQLite compatibility
  */
 
+// Re-export prisma for backward compatibility
+export { prisma } from './db';
+
 /**
  * Create case-insensitive search conditions for SQLite
  * Since SQLite doesn't support mode: 'insensitive', we need to handle it differently
