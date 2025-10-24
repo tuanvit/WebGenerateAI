@@ -34,11 +34,11 @@ export interface RecommendationCriteria {
     subject: string;
     gradeLevel: 6 | 7 | 8 | 9;
     teachingObjective:
-        | "lesson-planning"
-        | "presentation"
-        | "assessment"
-        | "interactive-content"
-        | "research";
+    | "lesson-planning"
+    | "presentation"
+    | "assessment"
+    | "interactive-content"
+    | "research";
     outputType: "text" | "visual" | "video" | "interactive";
     difficultyPreference?: "beginner" | "intermediate" | "advanced";
 }
@@ -214,11 +214,61 @@ export const AI_TOOLS_DATABASE: AIToolDetails[] = [
 
 export class AIToolRecommendationService {
     private tools: AIToolDetails[] = AI_TOOLS_DATABASE;
+    private dbToolsLoaded: boolean = false;
+
+    /**
+     * Load tools from database and merge with static data
+     * This ensures admin-added tools are available
+     */
+    private async loadToolsFromDatabase(): Promise<void> {
+        if (this.dbToolsLoaded) return;
+
+        try {
+            // Dynamic import to avoid circular dependencies
+            const { AIToolsService } = await import('@/lib/admin/services/ai-tools-service');
+            const aiToolsService = new AIToolsService();
+
+            const result = await aiToolsService.getAITools({ limit: 1000 });
+
+            if (result.data && result.data.length > 0) {
+                // Convert database tools to AIToolDetails format
+                const dbTools: AIToolDetails[] = result.data.map(tool => ({
+                    id: tool.id,
+                    name: tool.name,
+                    description: tool.description,
+                    url: tool.url,
+                    category: tool.category as AIToolCategory,
+                    subjects: tool.subjects,
+                    gradeLevel: tool.gradeLevel as (6 | 7 | 8 | 9)[],
+                    useCase: tool.useCase,
+                    vietnameseSupport: tool.vietnameseSupport,
+                    difficulty: tool.difficulty as "beginner" | "intermediate" | "advanced",
+                    features: tool.features,
+                    pricingModel: tool.pricingModel as "free" | "freemium" | "paid",
+                    integrationInstructions: (tool as any).integrationGuide || tool.useCase,
+                    samplePrompts: tool.samplePrompts,
+                    relatedTools: tool.relatedTools
+                }));
+
+                // Merge database tools with static tools (database takes priority)
+                const staticToolIds = new Set(AI_TOOLS_DATABASE.map(t => t.id));
+                const newDbTools = dbTools.filter(t => !staticToolIds.has(t.id));
+
+                this.tools = [...dbTools.filter(t => staticToolIds.has(t.id)), ...newDbTools, ...AI_TOOLS_DATABASE.filter(t => !dbTools.some(db => db.id === t.id))];
+                this.dbToolsLoaded = true;
+            }
+        } catch (error) {
+            console.warn('Could not load tools from database, using static data:', error);
+            // Continue with static data
+        }
+    }
 
     async getRecommendedTools(
         criteria: RecommendationCriteria,
         userPreferences?: UserPreferences
     ): Promise<AITool[]> {
+        await this.loadToolsFromDatabase();
+
         let filteredTools = this.tools.filter((tool) => {
             const subjectMatch =
                 tool.subjects.includes(criteria.subject) ||
@@ -240,6 +290,8 @@ export class AIToolRecommendationService {
     }
 
     async getTrendingTools(limit: number = 10): Promise<AITool[]> {
+        await this.loadToolsFromDatabase();
+
         const trendingTools = this.tools
             .filter((tool) => tool.vietnameseSupport)
             .sort((a, b) => {
@@ -266,10 +318,14 @@ export class AIToolRecommendationService {
     }
 
     async getToolDetails(toolId: string): Promise<AIToolDetails | null> {
+        await this.loadToolsFromDatabase();
+
         return this.tools.find((tool) => tool.id === toolId) || null;
     }
 
     async searchTools(query: string, filters?: ToolFilters): Promise<AITool[]> {
+        await this.loadToolsFromDatabase();
+
         if (!query || query.trim() === "") {
             return [];
         }
@@ -289,10 +345,14 @@ export class AIToolRecommendationService {
     }
 
     async getToolsByCategory(category: AIToolCategory): Promise<AITool[]> {
+        await this.loadToolsFromDatabase();
+
         return this.tools.filter((tool) => tool.category === category);
     }
 
     async getSubjectSpecificTools(subject: string): Promise<AITool[]> {
+        await this.loadToolsFromDatabase();
+
         return this.tools.filter(
             (tool) =>
                 tool.subjects.includes(subject) ||

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/db-utils"
+import { getServerSession } from "next-auth/next"
+import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 const updateUserSchema = z.object({
@@ -16,7 +16,8 @@ export async function GET(
     { params }: { params: Promise<{ email: string }> }
 ) {
     try {
-        const { email } = await params;
+        const paramsData = await params;
+        const userEmail = decodeURIComponent(paramsData.email);
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user) {
@@ -26,10 +27,8 @@ export async function GET(
             )
         }
 
-        const email = decodeURIComponent(email)
-
         // Users can only access their own profile
-        if (session.user.email !== email) {
+        if (session.user.email !== userEmail) {
             return NextResponse.json(
                 { error: "Không có quyền truy cập thông tin này" },
                 { status: 403 }
@@ -37,7 +36,7 @@ export async function GET(
         }
 
         let user = await prisma.user.findUnique({
-            where: { email },
+            where: { email: userEmail },
             select: {
                 id: true,
                 email: true,
@@ -54,7 +53,7 @@ export async function GET(
         if (!user) {
             user = await prisma.user.create({
                 data: {
-                    email,
+                    email: userEmail,
                     name: session.user.name || '',
                     subjects: JSON.stringify([]),
                     gradeLevel: JSON.stringify([]),
@@ -95,7 +94,8 @@ export async function PUT(
     { params }: { params: Promise<{ email: string }> }
 ) {
     try {
-        const { email } = await params;
+        const paramsData = await params;
+        const userEmail = decodeURIComponent(paramsData.email);
         const session = await getServerSession(authOptions)
 
         if (!session || !session.user) {
@@ -105,10 +105,8 @@ export async function PUT(
             )
         }
 
-        const email = decodeURIComponent(email)
-
         // Users can only update their own profile
-        if (session.user.email !== email) {
+        if (session.user.email !== userEmail) {
             return NextResponse.json(
                 { error: "Không có quyền cập nhật thông tin này" },
                 { status: 403 }
@@ -128,7 +126,7 @@ export async function PUT(
         }
 
         const updatedUser = await prisma.user.upsert({
-            where: { email },
+            where: { email: userEmail },
             update: {
                 name: validatedData.name,
                 school: validatedData.school || null,
@@ -137,7 +135,7 @@ export async function PUT(
                 lastLoginAt: new Date()
             },
             create: {
-                email,
+                email: userEmail,
                 name: validatedData.name,
                 school: validatedData.school || null,
                 subjects: JSON.stringify(validatedData.subjects),

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { AITool, AIToolDetails, AIToolCategory, RecommendationCriteria } from '@/services/ai-tool-recommendation';
-import AIToolRecommendations from './AIToolRecommendations';
+import { AITool, AIToolCategory, AIToolDetails, RecommendationCriteria } from '@/services/ai-tool-recommendation';
+import { useEffect, useState } from 'react';
 import AIToolDetailsModal from './AIToolDetails';
+import AIToolRecommendations from './AIToolRecommendations';
 
 interface AIToolSelectorProps {
     subject: string;
@@ -11,6 +11,7 @@ interface AIToolSelectorProps {
     outputType: string;
     onToolSelect: (tool: AITool) => void;
     selectedTool?: AITool | null;
+    recommendedTools?: string[]; // Array of tool IDs or names to prioritize
 }
 
 export default function AIToolSelector({
@@ -18,7 +19,8 @@ export default function AIToolSelector({
     gradeLevel,
     outputType,
     onToolSelect,
-    selectedTool
+    selectedTool,
+    recommendedTools
 }: AIToolSelectorProps) {
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [selectedToolForDetails, setSelectedToolForDetails] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export default function AIToolSelector({
         if (subject && gradeLevel) {
             fetchQuickTools();
         }
-    }, [subject, gradeLevel, outputType]);
+    }, [subject, gradeLevel, outputType, recommendedTools]);
 
     const fetchQuickTools = async () => {
         try {
@@ -88,8 +90,24 @@ export default function AIToolSelector({
             const result = await response.json();
 
             if (result.success && result.data.length > 0) {
-                // Prioritize Vietnamese-supported tools
+                // Prioritize tools based on recommendedTools prop, then Vietnamese support
                 const sortedTools = result.data.sort((a: AIToolDetails, b: AIToolDetails) => {
+                    // First priority: recommended tools
+                    if (recommendedTools && recommendedTools.length > 0) {
+                        const aRecommended = recommendedTools.some(rec =>
+                            a.id.toLowerCase().includes(rec.toLowerCase()) ||
+                            a.name.toLowerCase().includes(rec.toLowerCase())
+                        );
+                        const bRecommended = recommendedTools.some(rec =>
+                            b.id.toLowerCase().includes(rec.toLowerCase()) ||
+                            b.name.toLowerCase().includes(rec.toLowerCase())
+                        );
+
+                        if (aRecommended && !bRecommended) return -1;
+                        if (!aRecommended && bRecommended) return 1;
+                    }
+
+                    // Second priority: Vietnamese support
                     if (a.vietnameseSupport && !b.vietnameseSupport) return -1;
                     if (!a.vietnameseSupport && b.vietnameseSupport) return 1;
                     return 0;
