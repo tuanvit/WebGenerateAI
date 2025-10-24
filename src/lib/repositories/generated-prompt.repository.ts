@@ -1,7 +1,7 @@
-import { GeneratedPrompt, PromptVersion, Prisma } from '@prisma/client';
-import { BaseRepository } from './base.repository';
-import type { CreateGeneratedPromptSchema } from '../../types/prompt';
+import { GeneratedPrompt, Prisma, PromptVersion } from '@prisma/client';
 import { z } from 'zod';
+import type { CreateGeneratedPromptSchema } from '../../types/prompt';
+import { BaseRepository } from './base.repository';
 
 type CreateGeneratedPromptInput = z.infer<typeof CreateGeneratedPromptSchema>;
 type UpdateGeneratedPromptInput = Partial<Omit<CreateGeneratedPromptInput, 'userId'>>;
@@ -17,7 +17,14 @@ export class GeneratedPromptRepository extends BaseRepository<
     async create(data: CreateGeneratedPromptInput): Promise<GeneratedPrompt> {
         try {
             return await this.db.generatedPrompt.create({
-                data,
+                data: {
+                    userId: data.userId,
+                    inputParameters: data.inputParameters,
+                    generatedText: data.generatedText,
+                    targetTool: data.targetTool,
+                    isShared: data.isShared,
+                    tags: data.tags ? JSON.stringify(data.tags) : null,
+                },
             });
         } catch (error) {
             this.handleError(error, 'tạo prompt');
@@ -54,9 +61,16 @@ export class GeneratedPromptRepository extends BaseRepository<
      */
     async update(id: string, data: UpdateGeneratedPromptInput): Promise<GeneratedPrompt> {
         try {
+            const updateData: any = {};
+            if (data.inputParameters !== undefined) updateData.inputParameters = data.inputParameters;
+            if (data.generatedText !== undefined) updateData.generatedText = data.generatedText;
+            if (data.targetTool !== undefined) updateData.targetTool = data.targetTool;
+            if (data.isShared !== undefined) updateData.isShared = data.isShared;
+            if (data.tags !== undefined) updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
+
             return await this.db.generatedPrompt.update({
                 where: { id },
-                data,
+                data: updateData,
             });
         } catch (error) {
             this.handleError(error, 'cập nhật prompt');
@@ -97,9 +111,12 @@ export class GeneratedPromptRepository extends BaseRepository<
             };
 
             if (filters?.tags?.length) {
-                where.tags = {
-                    hasSome: filters.tags,
-                };
+                // For JSON string fields, search within the JSON string
+                where.OR = filters.tags.map(tag => ({
+                    tags: {
+                        contains: tag,
+                    }
+                }));
             }
 
             if (filters?.targetTool) {
@@ -158,9 +175,12 @@ export class GeneratedPromptRepository extends BaseRepository<
             }
 
             if (filters?.tags?.length) {
-                where.tags = {
-                    hasSome: filters.tags,
-                };
+                // For JSON string fields, search within the JSON string
+                where.OR = filters.tags.map(tag => ({
+                    tags: {
+                        contains: tag,
+                    }
+                }));
             }
 
             if (filters?.targetTool) {

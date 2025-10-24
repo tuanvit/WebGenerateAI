@@ -1,7 +1,7 @@
 import { prisma } from '../../lib/db';
+import type { LibraryFilters } from '../../types/content';
 import type { GeneratedPrompt, PromptVersion } from '../../types/prompt';
 import type { PersonalLibraryService as IPersonalLibraryService } from '../../types/services';
-import type { LibraryFilters } from '../../types/content';
 import { DatabaseError, NotFoundError, UnauthorizedError } from '../../types/services';
 
 /**
@@ -17,12 +17,12 @@ export class PersonalLibraryService implements IPersonalLibraryService {
         try {
             const savedPrompt = await prisma.generatedPrompt.create({
                 data: {
-                    userId: prompt.userId,
-                    inputParameters: prompt.inputParameters,
+                    userId: prompt.userId || '',
+                    inputParameters: prompt.inputParameters as any,
                     generatedText: prompt.generatedText,
                     targetTool: prompt.targetTool,
                     isShared: prompt.isShared,
-                    tags: prompt.tags,
+                    tags: JSON.stringify(prompt.tags || []),
                 },
             });
 
@@ -32,6 +32,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
             return {
                 ...savedPrompt,
                 inputParameters: savedPrompt.inputParameters as Record<string, unknown>,
+                tags: JSON.parse(savedPrompt.tags || '[]'),
             };
         } catch (error) {
             console.error('Failed to save prompt:', error);
@@ -67,9 +68,12 @@ export class PersonalLibraryService implements IPersonalLibraryService {
                 }
 
                 if (filters.tags && filters.tags.length > 0) {
-                    where.tags = {
-                        hasSome: filters.tags,
-                    };
+                    // For JSON string fields, search within the JSON string
+                    where.OR = filters.tags.map(tag => ({
+                        tags: {
+                            contains: tag,
+                        }
+                    }));
                 }
 
                 if (filters.dateFrom || filters.dateTo) {
@@ -99,6 +103,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
             return prompts.map((prompt: any) => ({
                 ...prompt,
                 inputParameters: prompt.inputParameters as Record<string, unknown>,
+                tags: JSON.parse(prompt.tags || '[]'),
             }));
         } catch (error) {
             console.error('Failed to get prompts:', error);
@@ -136,7 +141,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
                 updateData.isShared = updates.isShared;
             }
             if (updates.tags !== undefined) {
-                updateData.tags = updates.tags;
+                updateData.tags = JSON.stringify(updates.tags);
             }
 
             const updatedPrompt = await prisma.generatedPrompt.update({
@@ -152,6 +157,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
             return {
                 ...updatedPrompt,
                 inputParameters: updatedPrompt.inputParameters as Record<string, unknown>,
+                tags: JSON.parse(updatedPrompt.tags || '[]'),
             };
         } catch (error) {
             if (error instanceof NotFoundError) {
@@ -298,6 +304,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
             return prompts.map((prompt: any) => ({
                 ...prompt,
                 inputParameters: prompt.inputParameters as Record<string, unknown>,
+                tags: JSON.parse(prompt.tags || '[]'),
             }));
         } catch (error) {
             console.error('Failed to get recent prompts:', error);
@@ -322,7 +329,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
                         },
                         {
                             tags: {
-                                hasSome: [query],
+                                contains: query,
                             },
                         },
                     ],
@@ -333,6 +340,7 @@ export class PersonalLibraryService implements IPersonalLibraryService {
             return prompts.map((prompt: any) => ({
                 ...prompt,
                 inputParameters: prompt.inputParameters as Record<string, unknown>,
+                tags: JSON.parse(prompt.tags || '[]'),
             }));
         } catch (error) {
             console.error('Failed to search prompts:', error);

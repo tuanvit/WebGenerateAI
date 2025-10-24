@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { ensureUserExists } from '@/lib/user-utils';
 import { getServerSession } from 'next-auth/next';
+import { NextRequest, NextResponse } from 'next/server';
 import { PersonalLibraryService } from '../../../../services/library';
 import { CreateGeneratedPromptSchema } from '../../../../types/prompt';
-import { LibraryFiltersSchema } from '../../../../types/content';
-import { ValidationError, UnauthorizedError } from '../../../../types/services';
+import { ValidationError } from '../../../../types/services';
 
 const personalLibrary = new PersonalLibraryService();
 
@@ -51,10 +51,10 @@ export async function GET(request: NextRequest) {
         // Validate filters - skip validation for now and cast types
         const validatedFilters = filters as any;
 
-        // Get user ID from session email as fallback
-        const userId = (session.user as any).id || session.user.email!;
+        // Get or create user from session
+        const user = await ensureUserExists(session.user.email!, session.user.name || undefined);
 
-        const prompts = await personalLibrary.getPrompts(userId, validatedFilters);
+        const prompts = await personalLibrary.getPrompts(user.id, validatedFilters);
 
         return NextResponse.json({
             success: true,
@@ -92,11 +92,17 @@ export async function POST(request: NextRequest) {
 
         const body = await request.json();
 
-        // Add user ID to the prompt data
-        const userId = (session.user as any).id || session.user.email!;
+        // Get or create user from session
+        const user = await ensureUserExists(session.user.email!, session.user.name || undefined);
+
+        // Map the body fields to match schema
         const promptData = {
-            ...body,
-            userId,
+            userId: user.id,
+            inputParameters: body.inputParameters || {},
+            generatedText: body.generatedText || body.content || '',
+            targetTool: body.targetTool || 'chatgpt',
+            isShared: body.isShared || false,
+            tags: body.tags || [],
         };
 
         // Validate the prompt data

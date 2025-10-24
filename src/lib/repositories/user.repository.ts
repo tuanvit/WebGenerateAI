@@ -1,7 +1,7 @@
-import { User, Prisma } from '@prisma/client';
-import { BaseRepository } from './base.repository';
-import type { CreateUserSchema, UpdateUserSchema } from '../../types/user';
+import { Prisma, User } from '@prisma/client';
 import { z } from 'zod';
+import type { CreateUserSchema, UpdateUserSchema } from '../../types/user';
+import { BaseRepository } from './base.repository';
 
 type CreateUserInput = z.infer<typeof CreateUserSchema>;
 type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
@@ -14,7 +14,11 @@ export class UserRepository extends BaseRepository<User, CreateUserInput, Update
         try {
             return await this.db.user.create({
                 data: {
-                    ...data,
+                    email: data.email,
+                    name: data.name,
+                    school: data.school,
+                    subjects: data.subjects ? JSON.stringify(data.subjects) : null,
+                    gradeLevel: data.gradeLevel ? JSON.stringify(data.gradeLevel) : null,
                     lastLoginAt: new Date(),
                 },
             });
@@ -54,9 +58,16 @@ export class UserRepository extends BaseRepository<User, CreateUserInput, Update
      */
     async update(id: string, data: UpdateUserInput): Promise<User> {
         try {
+            const updateData: any = {};
+            if (data.email !== undefined) updateData.email = data.email;
+            if (data.name !== undefined) updateData.name = data.name;
+            if (data.school !== undefined) updateData.school = data.school;
+            if (data.subjects !== undefined) updateData.subjects = data.subjects ? JSON.stringify(data.subjects) : null;
+            if (data.gradeLevel !== undefined) updateData.gradeLevel = data.gradeLevel ? JSON.stringify(data.gradeLevel) : null;
+
             return await this.db.user.update({
                 where: { id },
-                data,
+                data: updateData,
             });
         } catch (error) {
             this.handleError(error, 'cập nhật người dùng');
@@ -103,16 +114,21 @@ export class UserRepository extends BaseRepository<User, CreateUserInput, Update
         try {
             const where: Prisma.UserWhereInput = {};
 
+            // For JSON string fields, we need to use contains to search within the JSON
             if (filters?.subjects?.length) {
-                where.subjects = {
-                    hasSome: filters.subjects,
-                };
+                where.OR = filters.subjects.map(subject => ({
+                    subjects: {
+                        contains: subject,
+                    }
+                }));
             }
 
             if (filters?.gradeLevel?.length) {
-                where.gradeLevel = {
-                    hasSome: filters.gradeLevel,
-                };
+                where.OR = filters.gradeLevel.map(grade => ({
+                    gradeLevel: {
+                        contains: String(grade),
+                    }
+                }));
             }
 
             if (filters?.school) {

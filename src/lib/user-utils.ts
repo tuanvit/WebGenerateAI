@@ -1,4 +1,4 @@
-import { prisma } from "./db-utils"
+import { prisma } from "./db"
 
 export async function ensureUserExists(email: string, name?: string) {
     let user = await prisma.user.findUnique({
