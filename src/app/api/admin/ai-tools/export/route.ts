@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json(
-            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_ERROR },
+            { error: 'Lỗi server nội bộ', code: AdminErrorCode.INTERNAL_SERVER_ERROR },
             { status: 500 }
         );
     }

@@ -4,11 +4,10 @@
  */
 
 import { prisma } from '@/lib/db';
-import { AdminDashboardStats } from '../index';
 import { AdminErrorCode, createAdminError } from '../admin-errors';
+import { AdminDashboardStats } from '../index';
 import { AIToolsRepository } from '../repositories/ai-tools-repository';
-import templatesRepository from '../repositories/templates-repository';
-import { getAuditLogStats } from '../admin-audit';
+import { TemplatesRepository } from '../repositories/templates-repository-db';
 
 export class AdminDashboardService {
     private aiToolsRepo: AIToolsRepository;
@@ -16,7 +15,7 @@ export class AdminDashboardService {
 
     constructor() {
         this.aiToolsRepo = new AIToolsRepository();
-        this.templatesRepo = templatesRepository;
+        this.templatesRepo = new TemplatesRepository();
     }
 
     /**
@@ -28,13 +27,11 @@ export class AdminDashboardService {
                 aiToolsStats,
                 templatesStats,
                 userStats,
-                auditStats,
                 recentActivity
             ] = await Promise.all([
                 this.aiToolsRepo.getAIToolsStats(),
                 this.templatesRepo.getTemplatesStats(),
                 this.getUserStats(),
-                getAuditLogStats(30),
                 this.getRecentActivity()
             ]);
 
@@ -248,23 +245,23 @@ export class AdminDashboardService {
 
             // Calculate average rating
             const totalRatingPoints = sharedContentWithRatings.reduce(
-                (sum, content) => sum + (content.rating * content.ratingCount), 0
+                (sum: number, content) => sum + (content.rating * content.ratingCount), 0
             );
             const totalRatings = sharedContentWithRatings.reduce(
-                (sum, content) => sum + content.ratingCount, 0
+                (sum: number, content) => sum + content.ratingCount, 0
             );
             const averageRating = totalRatings > 0 ? totalRatingPoints / totalRatings : 0;
 
             // Top categories from AI tools
             const topCategories = Object.entries(aiToolsStats.byCategory)
-                .map(([category, count]) => ({ category, count }))
-                .sort((a, b) => b.count - a.count)
+                .map(([category, count]) => ({ category, count: count as number }))
+                .sort((a, b) => (b.count as number) - (a.count as number))
                 .slice(0, 5);
 
             // Top subjects from templates
             const topSubjects = Object.entries(templatesStats.bySubject)
-                .map(([subject, count]) => ({ subject, count }))
-                .sort((a, b) => b.count - a.count)
+                .map(([subject, count]) => ({ subject, count: count as number }))
+                .sort((a, b) => (b.count as number) - (a.count as number))
                 .slice(0, 5);
 
             return {

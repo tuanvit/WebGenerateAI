@@ -3,12 +3,12 @@
  * Handles business logic for managing 40+ AI tools
  */
 
-import { AIToolsRepository, AIToolData, AIToolFilters } from '../repositories/ai-tools-repository';
-import { validateAITool, validateBulkAIToolUpdate } from '../admin-validation';
-import { AdminErrorCode, createAdminError } from '../admin-errors';
-import { logAdminAction, AdminAction, AdminResource } from '../admin-audit';
+import { AdminAction, AdminResource, logAdminAction } from '../admin-audit';
 import { AdminUser } from '../admin-auth';
+import { AdminErrorCode, createAdminError } from '../admin-errors';
+import { validateAITool, validateBulkAIToolUpdate } from '../admin-validation';
 import { AdminPaginatedResponse } from '../index';
+import { AIToolData, AIToolFilters, AIToolsRepository } from '../repositories/ai-tools-repository';
 
 export interface AIToolSearchFilters extends AIToolFilters {
     searchTerm?: string;
@@ -113,7 +113,7 @@ export class AIToolsService {
      */
     async createAITool(data: AIToolData, user: AdminUser): Promise<AIToolData> {
         // Validate input data
-        const validatedData = validateAITool(data);
+        const validatedData = validateAITool(data) as Omit<AIToolData, 'id' | 'createdAt' | 'updatedAt'>;
 
         // Additional business logic validation
         await this.validateAIToolBusinessRules(validatedData);
@@ -143,7 +143,7 @@ export class AIToolsService {
         const existingTool = await this.getAIToolById(id);
 
         // Validate update data
-        const validatedData = validateAITool({ ...existingTool, ...data });
+        const validatedData = validateAITool({ ...existingTool, ...data }) as Omit<AIToolData, 'id' | 'createdAt' | 'updatedAt'>;
 
         // Additional business logic validation
         await this.validateAIToolBusinessRules(validatedData, id);
@@ -154,7 +154,7 @@ export class AIToolsService {
         // Log the action
         await logAdminAction(user, AdminAction.UPDATE_AI_TOOL, AdminResource.AI_TOOLS, id, {
             toolName: updatedTool.name,
-            changes: data
+            changes: data as any
         });
 
         return updatedTool;
@@ -217,7 +217,7 @@ export class AIToolsService {
         await logAdminAction(user, AdminAction.BULK_UPDATE_AI_TOOLS, AdminResource.AI_TOOLS, undefined, {
             affectedIds: validatedData.ids,
             updatedCount,
-            changes: validatedData.updates
+            changes: validatedData.updates as any
         });
 
         return updatedCount;
@@ -272,7 +272,7 @@ export class AIToolsService {
                 const toolData = toolsData[i];
 
                 // Validate the tool data
-                const validatedData = validateAITool(toolData);
+                const validatedData = validateAITool(toolData) as Omit<AIToolData, 'id' | 'createdAt' | 'updatedAt'>;
 
                 // Additional business logic validation
                 await this.validateAIToolBusinessRules(validatedData);
@@ -429,7 +429,7 @@ export class AIToolsService {
     /**
      * Validate AI tool business rules
      */
-    private async validateAIToolBusinessRules(data: AIToolData, excludeId?: string): Promise<void> {
+    private async validateAIToolBusinessRules(data: Omit<AIToolData, 'id' | 'createdAt' | 'updatedAt'>, excludeId?: string): Promise<void> {
         // Check for duplicate URLs
         const existingTools = await this.repository.getAITools({ search: '', page: 1, limit: 10000 });
         const duplicateUrl = existingTools.data.find(tool =>
@@ -453,7 +453,7 @@ export class AIToolsService {
     /**
      * Validate category-specific business rules
      */
-    private validateCategorySpecificRules(data: AIToolData): void {
+    private validateCategorySpecificRules(data: Omit<AIToolData, 'id' | 'createdAt' | 'updatedAt'>): void {
         switch (data.category) {
             case 'SIMULATION':
                 if (!data.subjects.includes('Khoa học tự nhiên') && !data.subjects.includes('Toán')) {
@@ -484,7 +484,7 @@ export class AIToolsService {
     /**
      * Validate subject and grade level combinations
      */
-    private validateSubjectGradeLevelCombinations(data: AIToolData): void {
+    private validateSubjectGradeLevelCombinations(data: Omit<AIToolData, 'id' | 'createdAt' | 'updatedAt'>): void {
         // Ensure grade levels are appropriate for subjects
         const hasAdvancedSubjects = data.subjects.some(subject =>
             ['Khoa học tự nhiên', 'Lịch sử & Địa lí'].includes(subject)
