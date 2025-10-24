@@ -1,313 +1,355 @@
-# Deployment Guide - AI Prompt Generator for Teachers
+# 🚀 Deployment Guide
 
-## Overview
+Hướng dẫn deploy AI Prompt Generator for Teachers lên production.
 
-This guide covers deployment options for the AI Prompt Generator application, including Vercel, Docker, and manual deployment configurations.
+## 🌐 Deployment Options
 
-## Prerequisites
+### 1. Vercel (Recommended)
+### 2. Docker
+### 3. Traditional Server
 
-- Node.js 18+ 
-- PostgreSQL database
-- Environment variables configured
-- SSL certificates (for production)
+---
 
-## Environment Configuration
+## 🔥 Vercel Deployment
 
-### Required Environment Variables
-
-Copy `.env.production.example` to `.env.production` and configure:
-
+### Bước 1: Chuẩn bị
 ```bash
-# Database
-DATABASE_URL="postgresql://username:password@host:5432/ai_prompt_generator?sslmode=require"
-
-# Authentication
-NEXTAUTH_URL="https://your-domain.com"
-NEXTAUTH_SECRET="your-32-character-secret"
-
-# OAuth
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-
-# Optional: Redis for caching
-REDIS_URL="redis://your-redis-host:6379"
+npm install -g vercel
 ```
 
-## Deployment Options
+### Bước 2: Cấu hình Database
+**Option A: PostgreSQL (Recommended)**
+```env
+DATABASE_URL="postgresql://username:password@host:5432/database?schema=public"
+```
 
-### 1. Vercel Deployment (Recommended)
+**Option B: PlanetScale**
+```env
+DATABASE_URL="mysql://username:password@host/database?sslaccept=strict"
+```
 
-#### Quick Deploy
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+### Bước 3: Environment Variables
+Tại Vercel Dashboard, thêm:
+```env
+DATABASE_URL=your-production-database-url
+NEXTAUTH_URL=https://your-domain.vercel.app
+NEXTAUTH_SECRET=your-production-secret
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+NODE_ENV=production
+```
 
-#### Manual Deploy
+### Bước 4: Deploy
 ```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
 vercel --prod
 ```
 
-#### Database Setup for Vercel
+### Bước 5: Database Migration
 ```bash
-# Run migrations on production database
-npm run deploy:migrate
+npx prisma db push
+npx prisma db seed
 ```
 
-### 2. Docker Deployment
+---
 
-#### Development
+## 🐳 Docker Deployment
+
+### Dockerfile
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --only=production
+
+COPY . .
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
+```
+
+### docker-compose.yml
+```yaml
+version: '3.8'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/ai_prompt_generator
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=your-secret
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=ai_prompt_generator
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:
+```
+
+### Deploy với Docker
 ```bash
-# Start with development compose
 docker-compose up -d
+docker-compose exec app npx prisma db push
+docker-compose exec app npm run seed
 ```
 
-#### Production
-```bash
-# Start with production compose
-npm run docker:prod
+---
 
-# Or manually
-docker-compose -f docker-compose.prod.yml up -d
+## 🖥️ Traditional Server Deployment
+
+### Bước 1: Server Setup (Ubuntu)
+```bash
+# Update system
+sudo apt update && sudo apt upgrade -y
+
+# Install Node.js
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Install PM2
+sudo npm install -g pm2
+
+# Install PostgreSQL
+sudo apt install postgresql postgresql-contrib
 ```
 
-#### Manual Docker Build
+### Bước 2: Database Setup
 ```bash
-# Build image
-docker build -t ai-prompt-generator .
-
-# Run with environment file
-docker run -d \
-  --name ai-prompt-generator \
-  --env-file .env.production \
-  -p 3000:3000 \
-  ai-prompt-generator
+sudo -u postgres psql
+CREATE DATABASE ai_prompt_generator;
+CREATE USER your_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE ai_prompt_generator TO your_user;
+\q
 ```
 
-### 3. Manual Server Deployment
-
-#### Prerequisites
-- Ubuntu/Debian server
-- Node.js 18+
-- PostgreSQL
-- Nginx (optional, for reverse proxy)
-
-#### Steps
+### Bước 3: Application Setup
 ```bash
-# 1. Clone repository
-git clone <your-repo-url>
-cd ai-prompt-generator
+# Clone repository
+git clone https://github.com/tuanvit/WebGenerateAI.git
+cd WebGenerateAI
 
-# 2. Install dependencies
+# Install dependencies
 npm ci --only=production
 
-# 3. Configure environment
-cp .env.production.example .env.production
-# Edit .env.production with your values
-
-# 4. Setup database
-npm run deploy:migrate
-
-# 5. Build application
+# Build application
 npm run build
 
-# 6. Start application
-npm start
+# Setup environment
+cp .env.example .env
+# Edit .env with production values
 
-# Or use PM2 for process management
-npm install -g pm2
-pm2 start npm --name "ai-prompt-generator" -- start
+# Database migration
+npx prisma db push
+npm run seed
+```
+
+### Bước 4: PM2 Configuration
+**ecosystem.config.js:**
+```javascript
+module.exports = {
+  apps: [{
+    name: 'ai-prompt-generator',
+    script: 'npm',
+    args: 'start',
+    cwd: '/path/to/WebGenerateAI',
+    env: {
+      NODE_ENV: 'production',
+      PORT: 3000
+    }
+  }]
+}
+```
+
+### Bước 5: Start Application
+```bash
+pm2 start ecosystem.config.js
 pm2 save
 pm2 startup
 ```
 
-## Database Migration
+### Bước 6: Nginx Configuration
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
 
-### Production Migration
-```bash
-# Run production migrations
-npm run deploy:migrate
-
-# Or manually
-npx prisma migrate deploy
-```
-
-### Backup Before Migration
-```bash
-# Create backup
-pg_dump $DATABASE_URL > backup-$(date +%Y%m%d).sql
-
-# Restore if needed
-psql $DATABASE_URL < backup-YYYYMMDD.sql
-```
-
-## SSL Configuration
-
-### Nginx SSL Setup
-```bash
-# Install certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Get SSL certificate
-sudo certbot --nginx -d your-domain.com
-
-# Auto-renewal
-sudo crontab -e
-# Add: 0 12 * * * /usr/bin/certbot renew --quiet
-```
-
-### Docker SSL
-Place SSL certificates in `nginx/ssl/`:
-- `cert.pem` - SSL certificate
-- `key.pem` - Private key
-
-## Health Checks
-
-The application includes health check endpoints:
-
-```bash
-# Check application health
-curl https://your-domain.com/api/health
-
-# Expected response
-{
-  "status": "healthy",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "version": "0.1.0",
-  "environment": "production",
-  "database": "connected"
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
 }
 ```
 
-## Performance Optimization
+---
 
-### Database Optimization
-- Connection pooling configured
-- Indexes on frequently queried fields
-- Query optimization for large datasets
+## 🔒 Security Checklist
 
-### Caching
-- Redis integration for session storage
-- Static asset caching via CDN
-- API response caching for read-heavy operations
-
-### Monitoring
-- Health check endpoints
-- Error logging and tracking
-- Performance metrics collection
-
-## Security Considerations
-
-### Environment Security
-- Never commit `.env` files
-- Use strong, unique secrets
-- Enable SSL/TLS in production
-- Configure CORS properly
+### Environment Variables
+- [ ] `NEXTAUTH_SECRET` - Unique production secret
+- [ ] `DATABASE_URL` - Secure database connection
+- [ ] `GOOGLE_CLIENT_ID/SECRET` - Production OAuth credentials
 
 ### Database Security
-- Use connection pooling
-- Enable SSL for database connections
-- Regular security updates
-- Backup encryption
+- [ ] Strong database password
+- [ ] Database firewall rules
+- [ ] Regular backups
+- [ ] SSL/TLS encryption
 
-## Troubleshooting
+### Application Security
+- [ ] HTTPS enabled
+- [ ] Security headers configured
+- [ ] Rate limiting implemented
+- [ ] Input validation enabled
+
+### Monitoring
+- [ ] Error tracking (Sentry)
+- [ ] Performance monitoring
+- [ ] Database monitoring
+- [ ] Uptime monitoring
+
+---
+
+## 📊 Performance Optimization
+
+### Database
+```bash
+# Database indexing
+npx prisma db push
+```
+
+### Caching
+```env
+# Redis for session storage
+REDIS_URL=redis://localhost:6379
+```
+
+### CDN
+- Static assets via CDN
+- Image optimization
+- Gzip compression
+
+---
+
+## 🔄 CI/CD Pipeline
+
+### GitHub Actions
+**.github/workflows/deploy.yml:**
+```yaml
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run tests
+        run: npm test
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
+          vercel-args: '--prod'
+```
+
+---
+
+## 🚨 Troubleshooting
 
 ### Common Issues
 
-#### Database Connection Errors
+**Build Errors:**
 ```bash
-# Check database connectivity
-npx prisma db pull
-
-# Verify environment variables
-echo $DATABASE_URL
+npm run build -- --debug
 ```
 
-#### Build Failures
+**Database Connection:**
 ```bash
-# Clear Next.js cache
-rm -rf .next
-
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
+npx prisma db push --accept-data-loss
 ```
 
-#### SSL Certificate Issues
+**Memory Issues:**
 ```bash
-# Check certificate validity
-openssl x509 -in cert.pem -text -noout
-
-# Verify nginx configuration
-nginx -t
+NODE_OPTIONS="--max-old-space-size=4096" npm run build
 ```
 
-### Logs and Debugging
+### Health Checks
+- **Application**: `GET /api/health`
+- **Database**: `GET /api/admin/system/database`
+- **Performance**: `GET /api/admin/system/performance`
 
-#### Docker Logs
+---
+
+## 📈 Monitoring & Maintenance
+
+### Log Management
 ```bash
-# View application logs
-docker-compose logs app
-
-# Follow logs
-docker-compose logs -f app
-```
-
-#### PM2 Logs
-```bash
-# View logs
+# PM2 logs
 pm2 logs ai-prompt-generator
 
-# Monitor
-pm2 monit
+# Application logs
+tail -f logs/application.log
 ```
 
-## Scaling Considerations
-
-### Horizontal Scaling
-- Load balancer configuration
-- Session store externalization (Redis)
-- Database read replicas
-- CDN for static assets
-
-### Vertical Scaling
-- Memory optimization
-- CPU usage monitoring
-- Database connection limits
-- Cache hit ratios
-
-## Backup and Recovery
-
-### Database Backup
+### Database Maintenance
 ```bash
-# Automated backup script
-#!/bin/bash
-DATE=$(date +%Y%m%d_%H%M%S)
-pg_dump $DATABASE_URL > backups/backup_$DATE.sql
+# Backup
+pg_dump ai_prompt_generator > backup.sql
+
+# Restore
+psql ai_prompt_generator < backup.sql
 ```
 
-### Application Backup
-- Code repository (Git)
-- Environment configuration
-- SSL certificates
-- User-uploaded content
+### Updates
+```bash
+git pull origin main
+npm ci --only=production
+npm run build
+pm2 restart ai-prompt-generator
+```
 
-## Support and Maintenance
+---
 
-### Regular Maintenance
-- Security updates
-- Dependency updates
-- Database maintenance
-- Log rotation
-- Certificate renewal
+**🎉 Deployment thành công!**
 
-### Monitoring Checklist
-- [ ] Application health checks
-- [ ] Database performance
-- [ ] SSL certificate expiry
-- [ ] Disk space usage
-- [ ] Memory and CPU usage
-- [ ] Error rates and logs
+Kiểm tra ứng dụng tại domain của bạn và đảm bảo tất cả tính năng hoạt động bình thường.

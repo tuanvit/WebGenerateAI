@@ -31,17 +31,41 @@ export const authOptions = {
 
                 try {
                     // Tạo hoặc cập nhật user demo
-                    const user = await prisma.user.upsert({
-                        where: { email: credentials.email },
-                        update: { name: credentials.name },
-                        create: {
+                    let user;
+                    try {
+                        user = await prisma.user.findUnique({
+                            where: { email: credentials.email }
+                        });
+
+                        if (!user) {
+                            user = await prisma.user.create({
+                                data: {
+                                    email: credentials.email,
+                                    name: credentials.name,
+                                    subjects: JSON.stringify(['Toán', 'Văn']),
+                                    gradeLevel: JSON.stringify([6, 7, 8, 9]),
+                                    role: credentials.email === 'admin@example.com' ? 'admin' : 'user'
+                                }
+                            });
+                        } else {
+                            user = await prisma.user.update({
+                                where: { email: credentials.email },
+                                data: {
+                                    name: credentials.name,
+                                    lastLoginAt: new Date()
+                                }
+                            });
+                        }
+                    } catch (dbError) {
+                        console.error('Database error:', dbError);
+                        // Fallback: return mock user for demo
+                        return {
+                            id: credentials.email === 'admin@example.com' ? 'admin-id' : 'user-id',
                             email: credentials.email,
                             name: credentials.name,
-                            subjects: JSON.stringify(['Toán', 'Văn']),
-                            gradeLevel: JSON.stringify([6, 7, 8, 9]),
                             role: credentials.email === 'admin@example.com' ? 'admin' : 'user'
-                        },
-                    });
+                        };
+                    }
 
                     return {
                         id: user.id,
@@ -51,7 +75,13 @@ export const authOptions = {
                     };
                 } catch (error) {
                     console.error('Demo auth error:', error);
-                    return null;
+                    // Fallback: return mock user for demo
+                    return {
+                        id: credentials.email === 'admin@example.com' ? 'admin-id' : 'user-id',
+                        email: credentials.email,
+                        name: credentials.name,
+                        role: credentials.email === 'admin@example.com' ? 'admin' : 'user'
+                    };
                 }
             }
         }),
