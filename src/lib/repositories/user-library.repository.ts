@@ -1,4 +1,4 @@
-import { UserLibrary, Prisma } from '@prisma/client';
+import { Prisma, UserLibrary } from '@prisma/client';
 import { BaseRepository } from './base.repository';
 
 interface CreateUserLibraryInput {
@@ -139,9 +139,12 @@ export class UserLibraryRepository extends BaseRepository<
                 }
 
                 if (filters.tags?.length) {
-                    where.content.tags = {
-                        hasSome: filters.tags,
-                    };
+                    // For JSON string fields, search within the JSON string
+                    where.content.OR = filters.tags.map(tag => ({
+                        tags: {
+                            contains: tag,
+                        }
+                    }));
                 }
             }
 

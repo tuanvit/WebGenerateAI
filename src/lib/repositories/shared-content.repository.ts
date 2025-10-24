@@ -1,7 +1,7 @@
-import { SharedContent, ContentRating, Prisma } from '@prisma/client';
-import { BaseRepository } from './base.repository';
-import type { CreateSharedContentSchema } from '../../types/content';
+import { ContentRating, Prisma, SharedContent } from '@prisma/client';
 import { z } from 'zod';
+import type { CreateSharedContentSchema } from '../../types/content';
+import { BaseRepository } from './base.repository';
 
 type CreateSharedContentInput = z.infer<typeof CreateSharedContentSchema>;
 type UpdateSharedContentInput = Partial<Omit<CreateSharedContentInput, 'authorId'>>;
@@ -17,7 +17,15 @@ export class SharedContentRepository extends BaseRepository<
     async create(data: CreateSharedContentInput): Promise<SharedContent> {
         try {
             return await this.db.sharedContent.create({
-                data,
+                data: {
+                    authorId: data.authorId,
+                    title: data.title,
+                    description: data.description,
+                    content: data.content,
+                    subject: data.subject,
+                    gradeLevel: data.gradeLevel,
+                    tags: data.tags ? JSON.stringify(data.tags) : null,
+                },
             });
         } catch (error) {
             this.handleError(error, 'tạo nội dung chia sẻ');
@@ -61,9 +69,17 @@ export class SharedContentRepository extends BaseRepository<
      */
     async update(id: string, data: UpdateSharedContentInput): Promise<SharedContent> {
         try {
+            const updateData: any = {};
+            if (data.title !== undefined) updateData.title = data.title;
+            if (data.description !== undefined) updateData.description = data.description;
+            if (data.content !== undefined) updateData.content = data.content;
+            if (data.subject !== undefined) updateData.subject = data.subject;
+            if (data.gradeLevel !== undefined) updateData.gradeLevel = data.gradeLevel;
+            if (data.tags !== undefined) updateData.tags = data.tags ? JSON.stringify(data.tags) : null;
+
             return await this.db.sharedContent.update({
                 where: { id },
-                data,
+                data: updateData,
             });
         } catch (error) {
             this.handleError(error, 'cập nhật nội dung chia sẻ');
@@ -116,9 +132,12 @@ export class SharedContentRepository extends BaseRepository<
             }
 
             if (filters.tags?.length) {
-                where.tags = {
-                    hasSome: filters.tags,
-                };
+                // For JSON string fields, search within the JSON string
+                where.OR = filters.tags.map(tag => ({
+                    tags: {
+                        contains: tag,
+                    }
+                }));
             }
 
             if (filters.rating) {

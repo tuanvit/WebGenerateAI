@@ -1,17 +1,16 @@
-import { prisma } from '../../lib/db';
 import { Prisma } from '@prisma/client';
+import { cacheService } from '../../lib/cache';
+import { prisma } from '../../lib/db';
+import { DatabaseOptimizer } from '../../lib/db-optimization';
 import {
-    SharedContent,
-    SearchFilters,
-    ShareableContent,
-    ContentRating,
-    CreateSharedContentSchema,
     CreateContentRatingSchema,
-    SearchFiltersSchema
+    CreateSharedContentSchema,
+    SearchFilters,
+    SearchFiltersSchema,
+    ShareableContent,
+    SharedContent
 } from '../../types/content';
 import { DatabaseError, ValidationError } from '../../types/services';
-import { cacheService } from '../../lib/cache';
-import { DatabaseOptimizer } from '../../lib/db-optimization';
 
 // Predefined Vietnamese educational tags
 export const EDUCATIONAL_TAGS = {
@@ -153,7 +152,7 @@ export class CommunityLibraryService {
                     content: validatedContent.content,
                     subject: validatedContent.subject,
                     gradeLevel: validatedContent.gradeLevel,
-                    tags: validatedContent.tags,
+                    tags: JSON.stringify(validatedContent.tags),
                     rating: 0,
                     ratingCount: 0
                 }

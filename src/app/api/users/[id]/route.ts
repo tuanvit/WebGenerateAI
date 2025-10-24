@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server"
-import { getServerSession } from "next-auth/next"
 import { authOptions } from "@/lib/auth"
-import { prisma } from "@/lib/db-utils"
+import { prisma } from "@/lib/db"
+import { getServerSession } from "next-auth/next"
+import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 
 const updateUserSchema = z.object({
@@ -105,8 +105,8 @@ export async function PUT(
             data: {
                 name: validatedData.name,
                 school: validatedData.school || null,
-                subjects: validatedData.subjects,
-                gradeLevel: validatedData.gradeLevel,
+                subjects: JSON.stringify(validatedData.subjects),
+                gradeLevel: JSON.stringify(validatedData.gradeLevel),
                 lastLoginAt: new Date()
             },
             select: {
@@ -125,7 +125,7 @@ export async function PUT(
     } catch (error) {
         if (error instanceof z.ZodError) {
             return NextResponse.json(
-                { error: error.errors[0].message },
+                { error: error.issues[0].message },
                 { status: 400 }
             )
         }
