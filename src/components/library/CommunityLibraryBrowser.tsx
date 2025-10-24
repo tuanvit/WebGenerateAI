@@ -1,13 +1,11 @@
 "use client"
 
-import { useState, useEffect, useCallback } from 'react'
-import { useSession } from 'next-auth/react'
-import { GeneratedPrompt } from '@/types/prompt'
-import { VIETNAMESE_SUBJECTS, GRADE_LEVELS } from '@/types/user'
 import { COMMON_TAGS } from '@/types/prompt'
-import { CommunityContentCard } from '../community/CommunityContentCard'
-import { StarRating } from '../ui/StarRating'
+import { GRADE_LEVELS, VIETNAMESE_SUBJECTS } from '@/types/user'
+import { useSession } from 'next-auth/react'
+import { useCallback, useEffect, useState } from 'react'
 import { RatingWithComment } from '../community/RatingWithComment'
+import { StarRating } from '../ui/StarRating'
 
 // Debounce utility function
 function debounce<T extends (...args: any[]) => any>(
@@ -33,6 +31,7 @@ interface SharedContent {
     ratingCount: number
     author: {
         name: string
+        email: string
         school?: string
     }
     createdAt: string
@@ -808,7 +807,7 @@ export default function CommunityLibraryBrowser({
                             <div key={item.id} className="border rounded-lg p-6 bg-white shadow hover:shadow-md transition-shadow">
                                 <div className="flex justify-between items-start mb-3">
                                     <h3 className="font-semibold text-lg text-gray-900 flex-1 pr-4">{item.title}</h3>
-                                    {session?.user?.id === item.author?.id && (
+                                    {session?.user?.email === item.author?.email && (
                                         <button
                                             onClick={() => handleDeleteContent(item.id)}
                                             className="p-2 text-red-400 hover:text-red-600 rounded-full hover:bg-red-50"

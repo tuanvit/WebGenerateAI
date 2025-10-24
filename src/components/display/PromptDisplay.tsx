@@ -1,9 +1,8 @@
 "use client"
 
-import { useState } from 'react'
+import { AIToolButtons, CopyPromptButton } from '@/components/integration'
 import { GeneratedPrompt } from '@/types/prompt'
-import { AIToolButtons } from '@/components/integration'
-import { CopyPromptButton } from '@/components/integration'
+import { useState } from 'react'
 
 interface PromptDisplayProps {
     prompt: GeneratedPrompt
@@ -161,7 +160,7 @@ export default function PromptDisplay({
                 </h4>
                 <AIToolButtons
                     prompt={prompt.generatedText}
-                    selectedTool={prompt.targetTool}
+                    selectedTool={prompt.targetTool as any}
                 />
             </div>
 

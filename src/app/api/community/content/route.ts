@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/db-utils';
+import { prisma } from '@/lib/db';
+import { getServerSession } from 'next-auth/next';
+import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 
 /**
@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
                             select: {
                                 id: true,
                                 name: true,
+                                email: true,
                                 school: true
                             }
                         }
@@ -103,6 +104,7 @@ export async function GET(request: NextRequest) {
                 ratingCount: item.ratingCount || 0,
                 author: {
                     name: item.author?.name || 'Ẩn danh',
+                    email: item.author?.email || '',
                     school: item.author?.school || ''
                 },
                 createdAt: item.createdAt,

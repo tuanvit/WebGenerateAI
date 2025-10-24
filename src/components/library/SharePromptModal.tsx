@@ -1,7 +1,7 @@
 "use client"
 
+import { COMMON_TAGS, GeneratedPrompt } from '@/types/prompt'
 import { useState } from 'react'
-import { GeneratedPrompt, COMMON_TAGS } from '@/types/prompt'
 
 interface SharePromptModalProps {
     prompt: GeneratedPrompt
@@ -12,10 +12,12 @@ interface SharePromptModalProps {
 }
 
 interface ShareData {
+    promptId: string
     title: string
     description: string
+    subject: string
+    gradeLevel: number
     tags: string[]
-    isPublic: boolean
 }
 
 export default function SharePromptModal({
@@ -25,15 +27,19 @@ export default function SharePromptModal({
     onShare,
     isLoading = false
 }: SharePromptModalProps) {
+    const params = prompt.inputParameters as any
+
     const [title, setTitle] = useState(() => {
-        const params = prompt.inputParameters as any
         return params.lessonName || params.topic || 'Prompt không có tiêu đề'
     })
     const [description, setDescription] = useState('')
-    const [selectedTags, setSelectedTags] = useState<string[]>(prompt.tags)
+    const [selectedTags, setSelectedTags] = useState<string[]>(prompt.tags || [])
     const [customTag, setCustomTag] = useState('')
-    const [isPublic, setIsPublic] = useState(true)
     const [errors, setErrors] = useState<Record<string, string>>({})
+
+    // Extract subject and gradeLevel from inputParameters
+    const subject = params.subject || ''
+    const gradeLevel = params.gradeLevel || params.grade || 6
 
     const validateForm = (): boolean => {
         const newErrors: Record<string, string> = {}
@@ -50,6 +56,14 @@ export default function SharePromptModal({
             newErrors.description = 'Mô tả quá dài (tối đa 1000 ký tự)'
         }
 
+        if (!subject) {
+            newErrors.subject = 'Không tìm thấy môn học trong prompt'
+        }
+
+        if (!gradeLevel || gradeLevel < 6 || gradeLevel > 9) {
+            newErrors.gradeLevel = 'Khối lớp phải từ 6-9'
+        }
+
         setErrors(newErrors)
         return Object.keys(newErrors).length === 0
     }
@@ -60,16 +74,44 @@ export default function SharePromptModal({
         if (!validateForm()) return
 
         try {
-            await onShare({
+            const shareData: ShareData = {
+                promptId: prompt.id,
                 title: title.trim(),
                 description: description.trim(),
-                tags: selectedTags,
-                isPublic
+                subject: subject,
+                gradeLevel: gradeLevel,
+                tags: selectedTags
+            }
+
+            // Call API directly instead of using callback
+            const response = await fetch('/api/community/share', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(shareData),
             })
+
+            if (!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.error || 'Không thể chia sẻ prompt')
+            }
+
+            const result = await response.json()
+            console.log('Shared successfully:', result)
+
+            // Call the callback if provided (for parent component to refresh)
+            if (onShare) {
+                await onShare(shareData)
+            }
+
+            alert('Đã chia sẻ prompt thành công!')
             onClose()
         } catch (error) {
             console.error('Error sharing prompt:', error)
-            setErrors({ submit: 'Có lỗi xảy ra khi chia sẻ prompt. Vui lòng thử lại.' })
+            setErrors({
+                submit: error instanceof Error ? error.message : 'Có lỗi xảy ra khi chia sẻ prompt. Vui lòng thử lại.'
+            })
         }
     }
 
@@ -216,8 +258,8 @@ export default function SharePromptModal({
                                             type="button"
                                             onClick={() => handleTagToggle(tag)}
                                             className={`px-2.5 py-0.5 rounded-full text-xs font-medium border transition-colors ${selectedTags.includes(tag)
-                                                    ? 'bg-blue-100 text-blue-800 border-blue-200'
-                                                    : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                                ? 'bg-blue-100 text-blue-800 border-blue-200'
+                                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                                                 }`}
                                         >
                                             {tag}
@@ -247,36 +289,25 @@ export default function SharePromptModal({
                             </div>
                         </div>
 
-                        {/* Privacy Settings */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
-                                Quyền riêng tư
-                            </label>
-                            <div className="space-y-2">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="privacy"
-                                        checked={isPublic}
-                                        onChange={() => setIsPublic(true)}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-700">
-                                        Công khai - Mọi người có thể xem và sử dụng
-                                    </span>
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="privacy"
-                                        checked={!isPublic}
-                                        onChange={() => setIsPublic(false)}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
-                                    />
-                                    <span className="ml-2 text-sm text-gray-700">
-                                        Riêng tư - Chỉ bạn có thể xem
-                                    </span>
-                                </label>
+                        {/* Subject and Grade Info */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                            <div className="flex items-start">
+                                <svg className="w-5 h-5 text-blue-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div className="flex-1">
+                                    <p className="text-sm font-medium text-blue-900 mb-1">Thông tin prompt</p>
+                                    <p className="text-sm text-blue-700">
+                                        Môn học: <span className="font-semibold">{subject || 'Không xác định'}</span>
+                                        {' • '}
+                                        Lớp: <span className="font-semibold">{gradeLevel}</span>
+                                    </p>
+                                    {(!subject || gradeLevel < 6 || gradeLevel > 9) && (
+                                        <p className="text-sm text-red-600 mt-2">
+                                            ⚠️ Prompt này thiếu thông tin môn học hoặc khối lớp không hợp lệ (6-9)
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
