@@ -1,11 +1,10 @@
-import { Suspense } from 'react';
-import DashboardStats from './DashboardStats';
-import SystemHealth from './SystemHealth';
-import RecentActivity from './RecentActivity';
 import CategoryChart from './CategoryChart';
+import DashboardStats from './DashboardStats';
+import RecentActivity from './RecentActivity';
+import SystemHealth from './SystemHealth';
 
 async function fetchDashboardData() {
-    const response = await fetch('http://localhost:3000/api/admin/dashboard', {
+    const response = await fetch(`${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/admin/dashboard`, {
         cache: 'no-store'
     });
 
