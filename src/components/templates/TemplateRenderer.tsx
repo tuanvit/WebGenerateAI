@@ -145,8 +145,8 @@ export default function TemplateRenderer({
                 return (
                     <select {...commonProps}>
                         <option value="">-- Chọn --</option>
-                        {variable.options?.map((option) => (
-                            <option key={option} value={option}>
+                        {variable.options?.map((option, index) => (
+                            <option key={`${index}-${option}`} value={option}>
                                 {option}
                             </option>
                         ))}
@@ -156,8 +156,8 @@ export default function TemplateRenderer({
             case 'multiselect':
                 return (
                     <div className="space-y-2">
-                        {variable.options?.map((option) => (
-                            <label key={option} className="flex items-center">
+                        {variable.options?.map((option, index) => (
+                            <label key={`${index}-${option}`} className="flex items-center">
                                 <input
                                     type="checkbox"
                                     checked={variables[variable.name]?.split(',').includes(option) || false}

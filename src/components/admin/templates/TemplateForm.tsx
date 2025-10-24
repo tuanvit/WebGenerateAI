@@ -1,7 +1,26 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { TemplateData, TemplateVariableData, TemplateExampleData } from '@/lib/admin/repositories/templates-repository';
+import { TemplateData } from '@/lib/admin/repositories/templates-repository-db';
+
+// Define the missing types locally
+export interface TemplateVariableData {
+    name: string;
+    label: string;
+    description?: string;
+    type: 'text' | 'textarea' | 'select' | 'multiselect';
+    required: boolean;
+    placeholder?: string;
+    options?: string[];
+    defaultValue?: string;
+}
+
+export interface TemplateExampleData {
+    title: string;
+    description?: string;
+    sampleInput: Record<string, any>;
+    expectedOutput: string;
+}
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -103,6 +122,7 @@ export default function TemplateForm({
     const [availableAITools, setAvailableAITools] = useState<Array<{ id: string, name: string }>>([]);
     const [loadingAITools, setLoadingAITools] = useState(false);
     const [tagsInputValue, setTagsInputValue] = useState('');
+    const [optionsTextValues, setOptionsTextValues] = useState<Record<number, string>>({});
 
     // Initialize form data
     useEffect(() => {
@@ -122,6 +142,15 @@ export default function TemplateForm({
                 defaultVars[variable.name] = variable.defaultValue || '';
             });
             setPreviewVariables(defaultVars);
+
+            // Initialize options text values for existing variables
+            const initialOptionsText: Record<number, string> = {};
+            template.variables?.forEach((variable, index) => {
+                if (variable.options && variable.options.length > 0) {
+                    initialOptionsText[index] = variable.options.join('\n');
+                }
+            });
+            setOptionsTextValues(initialOptionsText);
         }
     }, [template]);
 
@@ -246,10 +275,20 @@ export default function TemplateForm({
             defaultValue: ''
         };
 
-        setFormData(prev => ({
-            ...prev,
-            variables: [...(prev.variables || []), newVariable]
-        }));
+        setFormData(prev => {
+            const newVariables = [...(prev.variables || []), newVariable];
+            // Initialize empty options text for the new variable
+            const newIndex = newVariables.length - 1;
+            setOptionsTextValues(prevOptions => ({
+                ...prevOptions,
+                [newIndex]: ''
+            }));
+
+            return {
+                ...prev,
+                variables: newVariables
+            };
+        });
     };
 
     // Update variable
@@ -268,6 +307,23 @@ export default function TemplateForm({
             ...prev,
             variables: prev.variables?.filter((_, i) => i !== index) || []
         }));
+
+        // Clean up options text values - shift indices down for remaining variables
+        setOptionsTextValues(prevOptions => {
+            const newOptions: Record<number, string> = {};
+            Object.entries(prevOptions).forEach(([key, value]) => {
+                const keyIndex = parseInt(key);
+                if (keyIndex < index) {
+                    // Keep indices before the removed one
+                    newOptions[keyIndex] = value;
+                } else if (keyIndex > index) {
+                    // Shift indices after the removed one down by 1
+                    newOptions[keyIndex - 1] = value;
+                }
+                // Skip the removed index
+            });
+            return newOptions;
+        });
     };
 
     // Add new example
@@ -832,8 +888,18 @@ export default function TemplateForm({
                                                         <div>
                                                             <Label>Tùy chọn (mỗi dòng một tùy chọn)</Label>
                                                             <Textarea
-                                                                value={variable.options?.join('\n') || ''}
-                                                                onChange={(e) => updateVariable(index, 'options', e.target.value.split('\n').filter(opt => opt.trim()))}
+                                                                value={optionsTextValues[index] || ''}
+                                                                onChange={(e) => {
+                                                                    const rawValue = e.target.value;
+                                                                    // Update the raw text value immediately to allow proper typing
+                                                                    setOptionsTextValues(prev => ({
+                                                                        ...prev,
+                                                                        [index]: rawValue
+                                                                    }));
+                                                                    // Update the options array for the variable
+                                                                    const options = rawValue.split('\n').map(opt => opt.trim()).filter(opt => opt.length > 0);
+                                                                    updateVariable(index, 'options', options);
+                                                                }}
                                                                 placeholder="Tùy chọn 1&#10;Tùy chọn 2&#10;Tùy chọn 3"
                                                                 rows={3}
                                                             />
