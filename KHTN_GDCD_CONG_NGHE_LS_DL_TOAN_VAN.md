@@ -109,10 +109,10 @@
 **Microsoft Copilot (do Microsoft cung cấp): [https://copilot.microsoft.com/](https://copilot.microsoft.com/?utm_source=chatgpt.com)**
 
 \- Mục tiêu:\
-Soạn giáo án, hệ thống câu hỏi phát triển năng lực lịch sử -- địa lí, gợi mở tình huống học tập gắn với bối cảnh thực tế.
+Soạn kế hoạch bài dạy, hệ thống câu hỏi phát triển năng lực lịch sử -- địa lí, gợi mở tình huống học tập gắn với bối cảnh thực tế.
 
 \- Câu lệnh (Prompt) gợi ý:\
-Hãy soạn giáo án môn Lịch sử & Địa lí lớp ..., bài "..................", theo Công văn 5512, CT GDPT 2018.\
+Hãy soạn kế hoạch bài dạy môn Lịch sử & Địa lí lớp ..., bài "..................", theo Công văn 5512, CT GDPT 2018.\
 Yêu cầu:
 
 Mục tiêu: phát triển năng lực tìm hiểu lịch sử, tư duy lịch sử; năng lực nhận thức địa lí, khai thác bản đồ; phẩm chất yêu nước, trách nhiệm.
@@ -122,11 +122,11 @@ Tiến trình: Khởi động -- Hình thành kiến thức -- Luyện tập -- 
 Mỗi hoạt động nêu rõ: Mục tiêu -- Nội dung -- Sản phẩm học tập -- Tổ chức thực hiện (GV & HS).
 
 Thêm 3 câu hỏi khởi động, 5 câu luyện tập, 2 câu vận dụng thực tiễn (phân tích tư liệu/đọc bản đồ).\
-Trình bày theo mẫu giáo án chuẩn THCS.
+Trình bày theo mẫu kế hoạch bài dạy chuẩn THCS.
 
 \- Ứng dụng thực tế:
 
-Dán prompt vào ChatGPT/Gemini/Copilot → xuất giáo án chi tiết.
+Dán prompt vào ChatGPT/Gemini/Copilot → xuất kế hoạch bài dạy chi tiết.
 
 Tiếp tục lệnh: "Tạo phiên bản ngắn gọn 2 trang A4 để chia sẻ cho đồng nghiệp."
 
@@ -373,11 +373,11 @@ gợi ý tài nguyên & bài tập phù hợp từng HS.
 **Microsoft Copilot (do Microsoft cung cấp): [https://copilot.microsoft.com/](https://copilot.microsoft.com/?utm_source=chatgpt.com)**
 
 \- Mục tiêu:\
-Soạn giáo án, hệ thống câu hỏi phát triển năng lực kỹ thuật, gợi mở tình huống học tập thực tế.
+Soạn kế hoạch bài dạy, hệ thống câu hỏi phát triển năng lực kỹ thuật, gợi mở tình huống học tập thực tế.
 
 \- Câu lệnh (Prompt) gợi ý:
 
-Hãy soạn giáo án môn *Công nghệ lớp ...*, bài ".................."\
+Hãy soạn kế hoạch bài dạy môn *Công nghệ lớp ...*, bài ".................."\
 theo Công văn 5512, chương trình GDPT 2018.\
 Yêu cầu:
 
@@ -388,11 +388,11 @@ Yêu cầu:
 \+ Mỗi hoạt động ghi rõ: Mục tiêu -- Nội dung -- Sản phẩm học tập -- Tổ chức thực hiện (GV và HS).
 
 \+ Thêm 3 câu hỏi khởi động, 5 câu luyện tập, 2 câu vận dụng thực tiễn.\
-Trình bày theo mẫu giáo án chuẩn của giáo viên THCS.
+Trình bày theo mẫu kế hoạch bài dạy chuẩn của giáo viên THCS.
 
 \- Ứng dụng thực tế:
 
-\+ Dán prompt vào ChatGPT, Gemini hoặc Copilot → xuất ra giáo án chi tiết.
+\+ Dán prompt vào ChatGPT, Gemini hoặc Copilot → xuất ra kế hoạch bài dạy chi tiết.
 
 \+ Tiếp tục lệnh: *"Tạo phiên bản ngắn gọn 2 trang A4 để chia sẻ cho đồng nghiệp."*
 
@@ -669,7 +669,7 @@ Phân tích dữ liệu học tập môn Công nghệ của học sinh trong 4 t
 
 **🔹 Câu lệnh mẫu (Prompt):**
 
-Hãy soạn giáo án môn Giáo dục công dân lớp 8
+Hãy soạn kế hoạch bài dạy môn Giáo dục công dân lớp 8
 
 Bài: .....................................
 
@@ -909,11 +909,11 @@ Viết 3 mẫu nhận xét tích cực, 3 mẫu nhận xét cần cố gắng.
 
 **🎯 Mục tiêu:**
 
-Soạn giáo án, hệ thống câu hỏi phát triển năng lực, gợi mở tình huống học tập.
+Soạn kế hoạch bài dạy, hệ thống câu hỏi phát triển năng lực, gợi mở tình huống học tập.
 
 **💡 Câu lệnh (Prompt) gợi ý:**
 
-Hãy soạn giáo án môn Khoa học tự nhiên lớp......., bài "..................."
+Hãy soạn kế hoạch bài dạy môn Khoa học tự nhiên lớp......., bài "..................."
 
 theo Công văn 5512, chương trình GDPT 2018.
 
@@ -927,11 +927,11 @@ Yêu cầu:
 
 \- Thêm 3 câu hỏi khởi động, 5 câu luyện tập, 2 câu vận dụng thực tiễn.
 
-Trình bày theo mẫu giáo án chuẩn của GV THCS.
+Trình bày theo mẫu kế hoạch bài dạy chuẩn của GV THCS.
 
 **🔧 Ứng dụng thực tế:**
 
--   Dán prompt vào **ChatGPT, Gemini hoặc Copilot** → xuất ra **giáo án chi tiết**.
+-   Dán prompt vào **ChatGPT, Gemini hoặc Copilot** → xuất ra **kế hoạch bài dạy chi tiết**.
 
 -   Tiếp tục lệnh:
 
@@ -1227,7 +1227,7 @@ Phân tích dữ liệu học tập học sinh trong 4 tuần.
 
 ### **I. THIẾT KẾ BÀI GIẢNG THEO CHƯƠNG TRÌNH GDPT 2018**
 
-#### **1. Soạn giáo án, khởi động -- luyện tập -- vận dụng**
+#### **1. Soạn kế hoạch bài dạy, khởi động -- luyện tập -- vận dụng**
 
 #### **Công cụ: ChatGPT, Gemini, Copilot**
 
@@ -1237,9 +1237,9 @@ Phân tích dữ liệu học tập học sinh trong 4 tuần.
 
 **Copilot** [**https://copilot.microsoft.com/**](https://copilot.microsoft.com/)
 
-✅ **Mục tiêu:** Soạn giáo án định hướng phát triển năng lực; tạo hệ thống câu hỏi theo các mức độ.
+✅ **Mục tiêu:** Soạn kế hoạch bài dạy định hướng phát triển năng lực; tạo hệ thống câu hỏi theo các mức độ.
 
-Câu lệnh: Bạn là giáo viên Toán THCS. Hãy soạn giáo án theo công văn 5512 cho bài\....., lớp\...\..., theo hướng phát triển năng lực. Bao gồm:
+Câu lệnh: Bạn là giáo viên Toán THCS. Hãy soạn kế hoạch bài dạy theo công văn 5512 cho bài\....., lớp\...\..., theo hướng phát triển năng lực. Bao gồm:
 
 \- Mục tiêu bài học
 
@@ -1473,7 +1473,7 @@ Ví dụ: Gợi ý chủ đề học tiếp theo cho học sinh sau khi hoàn th
 
 ### **I. ỨNG DỤNG AI TRONG SOẠN GIẢNG VÀ THIẾT KẾ BÀI HỌC NGỮ VĂN**
 
-#### 1. **Soạn giáo án và tạo câu hỏi khởi động -- luyện tập -- vận dụng**
+#### 1. **Soạn kế hoạch bài dạy và tạo câu hỏi khởi động -- luyện tập -- vận dụng**
 
 #### ✅ Công cụ: **ChatGPT, Gemini, Copilot**
 
@@ -1485,7 +1485,7 @@ Copilot <https://copilot.microsoft.com/>
 
 Soạn bài học phát triển năng lực theo CV 5512 (gồm mục tiêu, nội dung, hoạt động, câu hỏi 4 mức độ nhận thức).
 
-Câu lệnh: Bạn là giáo viên Ngữ văn THCS. Hãy soạn giáo án theo Công văn 5512 cho bài \"\...\...\...\.....\" (Ngữ văn lớp\...\.....), theo định hướng phát triển năng lực. Bao gồm:
+Câu lệnh: Bạn là giáo viên Ngữ văn THCS. Hãy soạn kế hoạch bài dạy theo Công văn 5512 cho bài \"\...\...\...\.....\" (Ngữ văn lớp\...\.....), theo định hướng phát triển năng lực. Bao gồm:
 
 \- Mục tiêu bài học
 

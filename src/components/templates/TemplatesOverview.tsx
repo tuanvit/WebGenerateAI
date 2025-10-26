@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 interface TemplateStats {
     totalTemplates: number;
@@ -52,7 +52,7 @@ export default function TemplatesOverview() {
     }
 
     const outputTypeNames: Record<string, string> = {
-        'lesson-plan': 'Giáo án',
+        'lesson-plan': 'Kế hoạch bài dạy',
         'presentation': 'Bài thuyết trình',
         'assessment': 'Đánh giá',
         'interactive': 'Tương tác',

@@ -30,7 +30,7 @@ export default function Home() {
           </h1>
 
           <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-gray-600 leading-relaxed">
-            Hệ thống thông minh giúp giáo viên tạo prompt AI cho giáo án, slide thuyết trình và đánh giá.
+            Hệ thống thông minh giúp giáo viên tạo prompt AI cho kế hoạch bài dạy, slide thuyết trình và đánh giá.
             <span className="font-semibold text-blue-600">Tuân thủ chuẩn GDPT 2018 và Công văn 5512.</span>
           </p>
 
@@ -92,9 +92,9 @@ export default function Home() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-3">📝 Giáo án chuyên nghiệp</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">📝 Kế hoạch bài dạy chuyên nghiệp</h3>
             <p className="text-gray-600 leading-relaxed">
-              Tạo prompt AI để sinh giáo án 4-5 cột theo chuẩn Công văn 5512, phù hợp với từng môn học và lớp
+              Tạo prompt AI để sinh kế hoạch bài dạy 4-5 cột theo chuẩn Công văn 5512, phù hợp với từng môn học và lớp
             </p>
           </div>
 

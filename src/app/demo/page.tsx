@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
+import { useState } from 'react';
 
 export default function DemoPage() {
     const [selectedTool, setSelectedTool] = useState('ChatGPT');
@@ -16,7 +16,7 @@ export default function DemoPage() {
             return;
         }
 
-        const prompt = `Bạn là một giáo viên ${subject} chuyên nghiệp. Hãy tạo một giáo án chi tiết cho bài học "${lessonName}" dành cho học sinh lớp ${gradeLevel} theo chuẩn GDPT 2018 và Công văn 5512.
+        const prompt = `Bạn là một giáo viên ${subject} chuyên nghiệp. Hãy tạo một kế hoạch bài dạy chi tiết cho bài học "${lessonName}" dành cho học sinh lớp ${gradeLevel} theo chuẩn GDPT 2018 và Công văn 5512.
 
 Yêu cầu:
 - Tuân thủ chặt chẽ chuẩn kiến thức kỹ năng lớp ${gradeLevel}
@@ -24,7 +24,7 @@ Yêu cầu:
 - Bao gồm hoạt động cá nhân và nhóm
 - Có đánh giá năng lực học sinh
 
-Định dạng giáo án 5 cột:
+Định dạng kế hoạch bài dạy 5 cột:
 1. Hoạt động của giáo viên
 2. Hoạt động của học sinh  
 3. Nội dung kiến thức
@@ -53,12 +53,12 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                         Demo - AI Prompt Generator for Teachers
                     </h1>
                     <p className="mt-2 text-gray-600">
-                        Tạo prompt AI cho giáo án, thuyết trình và đánh giá
+                        Tạo prompt AI cho kế hoạch bài dạy, thuyết trình và đánh giá
                     </p>
                 </div>
 
                 <div className="bg-white rounded-lg shadow p-6 mb-6">
-                    <h2 className="text-xl font-semibold mb-4">Tạo Prompt Giáo Án</h2>
+                    <h2 className="text-xl font-semibold mb-4">Tạo Prompt Kế Hoạch Bài Dạy</h2>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
@@ -121,8 +121,8 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                     key={tool}
                                     onClick={() => setSelectedTool(tool)}
                                     className={`px-4 py-2 rounded-md text-sm font-medium ${selectedTool === tool
-                                            ? 'bg-blue-600 text-white'
-                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                                         }`}
                                 >
                                     {tool}
@@ -163,7 +163,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                 <li>1. Sao chép prompt ở trên</li>
                                 <li>2. Mở {selectedTool}</li>
                                 <li>3. Dán prompt vào và nhấn Enter</li>
-                                <li>4. Chờ AI tạo giáo án hoàn chỉnh</li>
+                                <li>4. Chờ AI tạo kế hoạch bài dạy hoàn chỉnh</li>
                             </ol>
                         </div>
                     </div>

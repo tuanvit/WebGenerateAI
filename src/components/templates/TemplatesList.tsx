@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { PromptTemplate } from '@/services/templates/SubjectTemplateService';
+import { useEffect, useState } from 'react';
 
 interface TemplatesListProps {
     onSelectTemplate?: (template: PromptTemplate) => void;
@@ -58,7 +58,7 @@ export default function TemplatesList({ onSelectTemplate, showActions = true }: 
     const gradeLevels = ['6', '7', '8', '9'];
 
     const outputTypeNames: Record<string, string> = {
-        'lesson-plan': 'Giáo án',
+        'lesson-plan': 'Kế hoạch bài dạy',
         'presentation': 'Bài thuyết trình',
         'assessment': 'Đánh giá',
         'interactive': 'Tương tác',

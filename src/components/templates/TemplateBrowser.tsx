@@ -189,7 +189,7 @@ export default function TemplateBrowser({
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         >
                             <option value="">Tất cả loại</option>
-                            <option value="lesson-plan">Giáo án</option>
+                            <option value="lesson-plan">Kế hoạch bài dạy</option>
                             <option value="presentation">Bài thuyết trình</option>
                             <option value="assessment">Đánh giá</option>
                             <option value="activity">Hoạt động</option>

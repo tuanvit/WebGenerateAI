@@ -62,7 +62,7 @@ export default function TemplatesAdminPage() {
     }, []);
 
     const outputTypeNames: Record<string, string> = {
-        'lesson-plan': 'Giáo án',
+        'lesson-plan': 'Kế hoạch bài dạy',
         'presentation': 'Bài thuyết trình',
         'assessment': 'Đánh giá',
         'interactive': 'Tương tác',

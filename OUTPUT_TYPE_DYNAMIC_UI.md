@@ -12,11 +12,11 @@
 ```typescript
 const outputTypeConfig = {
     'lesson-plan': {
-        label: 'Giáo án',
+        label: 'Kế hoạch bài dạy',
         icon: '📚',
-        buttonText: 'Tạo Prompt Giáo Án',
+        buttonText: 'Tạo Prompt Kế Hoạch Bài Dạy',
         recommendedTools: ['chatgpt', 'gemini', 'copilot'],
-        description: 'Tạo giáo án chi tiết tuân thủ GDPT 2018'
+        description: 'Tạo kế hoạch bài dạy chi tiết tuân thủ GDPT 2018'
     },
     'presentation': {
         label: 'Bài thuyết trình',
@@ -56,7 +56,7 @@ const outputTypeConfig = {
 
 **Sau:**
 - Nút thay đổi theo loại đầu ra:
-  - Giáo án: "📚 Tạo Prompt Giáo Án"
+  - Kế hoạch bài dạy: "📚 Tạo Prompt Kế Hoạch Bài Dạy"
   - Thuyết trình: "📊 Tạo Prompt Thuyết Trình"
   - Đánh giá: "📝 Tạo Prompt Đánh Giá"
   - Hoạt động tương tác: "🎮 Tạo Prompt Hoạt Động"
@@ -73,7 +73,7 @@ const outputTypeConfig = {
 - Tiêu đề thay đổi theo loại đầu ra với icon phù hợp
 - Thêm mô tả ngắn gọn về mục đích
 - Ưu tiên hiển thị công cụ phù hợp nhất:
-  - **Giáo án**: ChatGPT, Gemini, Copilot
+  - **Kế hoạch bài dạy**: ChatGPT, Gemini, Copilot
   - **Thuyết trình**: Gamma, Canva, ChatGPT
   - **Đánh giá**: ChatGPT, Gemini, Copilot
   - **Hoạt động tương tác**: Canva, Gamma, ChatGPT
@@ -103,8 +103,8 @@ Logic sắp xếp công cụ AI:
 
 Tất cả các nhãn và placeholder đều thay đổi động theo loại đầu ra:
 
-- **Tiêu đề card**: "Thông tin giáo án" → "Thông tin [loại đầu ra]"
-- **Chủ đề**: "Chủ đề giáo án" → "Chủ đề [loại đầu ra]"
+- **Tiêu đề card**: "Thông tin kế hoạch bài dạy" → "Thông tin [loại đầu ra]"
+- **Chủ đề**: "Chủ đề kế hoạch bài dạy" → "Chủ đề [loại đầu ra]"
 - **Mục tiêu**: "Mục tiêu bài học" → "Mục tiêu [loại đầu ra]"
 - **Placeholder**: Thay đổi ví dụ phù hợp với từng loại
 
@@ -118,7 +118,7 @@ Tất cả các nhãn và placeholder đều thay đổi động theo loại đ�
 ### 2. Công Cụ AI Phù Hợp Hơn
 - Đề xuất công cụ tối ưu cho từng loại đầu ra
 - Ví dụ: Gamma và Canva được ưu tiên cho thuyết trình
-- ChatGPT và Gemini được ưu tiên cho giáo án và đánh giá
+- ChatGPT và Gemini được ưu tiên cho kế hoạch bài dạy và đánh giá
 
 ### 3. Tính Nhất Quán
 - Tất cả các thành phần UI đều đồng bộ với loại đầu ra

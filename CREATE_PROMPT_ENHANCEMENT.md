@@ -6,10 +6,10 @@
 ## Các thay đổi chính
 
 ### 1. Cập nhật "Loại prompt cần tạo"
-**Trước**: 4 loại cơ bản (Giáo án, Slide thuyết trình, Câu hỏi đánh giá, Hoạt động tương tác)
+**Trước**: 4 loại cơ bản (Kế hoạch bài dạy, Slide thuyết trình, Câu hỏi đánh giá, Hoạt động tương tác)
 
 **Sau**: 8 loại tương ứng với AI tools database:
-- 📝 **Tạo văn bản** - Giáo án, nội dung bài học, tài liệu
+- 📝 **Tạo văn bản** - Kế hoạch bài dạy, nội dung bài học, tài liệu
   - AI Tools: ChatGPT, Gemini, Copilot, Perplexity AI
 - 📊 **Thuyết trình** - Slide, poster, infographic  
   - AI Tools: Canva AI, Gamma App, Tome

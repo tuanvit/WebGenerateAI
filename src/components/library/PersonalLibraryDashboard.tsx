@@ -242,7 +242,7 @@ export default function PersonalLibraryDashboard({
             // Check if it's own prompt
             if (prompt.inputParameters) {
                 const params = prompt.inputParameters as any
-                if (params.outputFormat || params.outputType === 'giao-an') return 'Giáo án'
+                if (params.outputFormat || params.outputType === 'giao-an') return 'Kế hoạch bài dạy'
                 if (params.slideCount || params.outputType === 'slide') return 'Thuyết trình'
                 if (params.questionCount || params.outputType === 'quiz') return 'Đánh giá'
                 if (params.outputType === 'rubric') return 'Thang đánh giá'

@@ -1,11 +1,11 @@
 "use client"
 
+import AIToolsBrowserWithFilters from "@/components/ai-tools/AIToolsBrowserWithFilters"
+import Header from "@/components/layout/Header"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import Header from "@/components/layout/Header"
-import Link from "next/link"
-import AIToolsBrowserWithFilters from "@/components/ai-tools/AIToolsBrowserWithFilters"
 
 // Component to display AI tools count from database
 function AIToolsStatsCard() {
@@ -95,8 +95,8 @@ export default function Dashboard() {
                                 </div>
                             </div>
                             <div className="ml-4">
-                                <h3 className="text-lg font-medium text-gray-900">Tạo giáo án</h3>
-                                <p className="text-sm text-gray-500">Tạo prompt cho giáo án 4-5 cột</p>
+                                <h3 className="text-lg font-medium text-gray-900">Tạo kế hoạch bài dạy</h3>
+                                <p className="text-sm text-gray-500">Tạo prompt cho kế hoạch bài dạy 4-5 cột</p>
                             </div>
                         </div>
                         <div className="mt-4">

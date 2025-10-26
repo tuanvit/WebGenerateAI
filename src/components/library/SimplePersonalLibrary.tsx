@@ -162,7 +162,7 @@ export default function SimplePersonalLibrary() {
 
     const getItemType = (item: PersonalLibraryItem) => {
         if (item.type === 'saved' || item.subject) return 'Đã lưu từ cộng đồng'
-        if (item.inputParameters?.outputType === 'giao-an') return 'Giáo án'
+        if (item.inputParameters?.outputType === 'giao-an') return 'Kế hoạch bài dạy'
         if (item.inputParameters?.outputType === 'slide') return 'Slide'
         if (item.inputParameters?.outputType === 'quiz') return 'Câu hỏi'
         if (item.inputParameters?.outputType === 'rubric') return 'Thang đánh giá'

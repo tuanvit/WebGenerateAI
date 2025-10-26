@@ -58,12 +58,12 @@ function generatePrompt(data: PromptRequest): string {
 
 function generateLessonPlanPrompt(data: PromptRequest): string {
     const styleInstructions = {
-        'ngan': 'Tạo giáo án ngắn gọn, tập trung vào các hoạt động chính.',
-        'chi-tiet': 'Tạo giáo án chi tiết với mô tả cụ thể từng hoạt động.',
-        'day-du': 'Tạo giáo án đầy đủ với tất cả các thành phần và phụ lục.'
+        'ngan': 'Tạo kế hoạch bài dạy ngắn gọn, tập trung vào các hoạt động chính.',
+        'chi-tiet': 'Tạo kế hoạch bài dạy chi tiết với mô tả cụ thể từng hoạt động.',
+        'day-du': 'Tạo kế hoạch bài dạy đầy đủ với tất cả các thành phần và phụ lục.'
     };
 
-    return `# PROMPT TẠO GIÁO ÁN CHUYÊN NGHIỆP
+    return `# PROMPT TẠO KẾ HOẠCH BÀI DẠY CHUYÊN NGHIỆP
 
 ## THÔNG TIN CƠ BẢN
 - **Môn học:** ${data.subject}
@@ -72,12 +72,12 @@ function generateLessonPlanPrompt(data: PromptRequest): string {
 - **Mục tiêu:** ${data.objectives || 'Học sinh nắm được kiến thức cơ bản về bài học'}
 
 ## YÊU CẦU CHUYÊN MÔN
-Bạn là một giáo viên ${data.subject} có 10+ năm kinh nghiệm. Hãy tạo một giáo án hoàn chỉnh tuân thủ:
+Bạn là một giáo viên ${data.subject} có 10+ năm kinh nghiệm. Hãy tạo một kế hoạch bài dạy hoàn chỉnh tuân thủ:
 - ✅ Chuẩn GDPT 2018 (Chương trình Giáo dục phổ thông)
 - ✅ Công văn 5512/BGDĐT-GDTrH về đổi mới phương pháp dạy học
 - ✅ Phương pháp dạy học tích cực, lấy học sinh làm trung tâm
 
-## ĐỊNH DẠNG GIÁO ÁN 5 CỘT
+## ĐỊNH DẠNG KẾ HOẠCH BÀI DẠY 5 CỘT
 
 | Hoạt động của GV | Hoạt động của HS | Nội dung kiến thức | Phương tiện dạy học | Ghi chú |
 |------------------|------------------|-------------------|-------------------|---------|
@@ -116,8 +116,8 @@ ${styleInstructions[data.style as keyof typeof styleInstructions]}
 ${data.uploadedContent ? `\n## TÀI LIỆU THAM KHẢO\n${data.uploadedContent}\n` : ''}
 
 ## OUTPUT MONG MUỐN
-Hãy tạo giáo án hoàn chỉnh bằng tiếng Việt, bao gồm:
-1. Bảng giáo án 5 cột chi tiết
+Hãy tạo kế hoạch bài dạy hoàn chỉnh bằng tiếng Việt, bao gồm:
+1. Bảng kế hoạch bài dạy 5 cột chi tiết
 2. Phụ lục: Bài tập, tài liệu phát tay (nếu có)
 3. Gợi ý mở rộng cho học sinh giỏi
 4. Hỗ trợ cho học sinh yếu

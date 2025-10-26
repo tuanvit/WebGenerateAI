@@ -7,12 +7,12 @@ import { TemplateData } from '@/lib/admin/repositories/templates-repository-db';
 
 const sampleTemplates: TemplateData[] = [
     {
-        name: 'Giáo án Toán theo CV 5512',
-        description: 'Template soạn giáo án môn Toán với cấu trúc 5 cột theo Công văn 5512',
+        name: 'Kế hoạch bài dạy Toán theo CV 5512',
+        description: 'Template soạn kế hoạch bài dạy môn Toán với cấu trúc 5 cột theo Công văn 5512',
         subject: 'Toán',
         gradeLevel: [6, 7, 8, 9],
         outputType: 'lesson-plan',
-        templateContent: `Bạn là một giáo viên Toán THCS chuyên nghiệp. Hãy soạn giáo án chi tiết cho bài học "{{lessonName}}" lớp {{gradeLevel}} theo Công văn 5512 và GDPT 2018.
+        templateContent: `Bạn là một giáo viên Toán THCS chuyên nghiệp. Hãy soạn kế hoạch bài dạy chi tiết cho bài học "{{lessonName}}" lớp {{gradeLevel}} theo Công văn 5512 và GDPT 2018.
 
 **THÔNG TIN BÀI HỌC:**
 - Môn học: Toán
@@ -26,7 +26,7 @@ const sampleTemplates: TemplateData[] = [
 - Áp dụng phương pháp dạy học tích cực: khám phá, giải quyết vấn đề, hợp tác nhóm
 - Sử dụng công cụ hỗ trợ: {{recommendedTools}}
 
-**CẤU TRÚC GIÁO ÁN 5 CỘT:**
+**CẤU TRÚC KẾ HOẠCH BÀI DẠY 5 CỘT:**
 | Hoạt động của GV | Hoạt động của HS | Nội dung kiến thức | Phương tiện dạy học | Ghi chú |
 
 **TIẾN TRÌNH DẠY HỌC:**
@@ -57,7 +57,7 @@ const sampleTemplates: TemplateData[] = [
 - Đánh giá kết quả: câu hỏi kiểm tra, bài tập
 - Tiêu chí đánh giá theo 4 mức độ: Xuất sắc, Tốt, Đạt, Chưa đạt
 
-Vui lòng tạo giáo án chi tiết theo cấu trúc trên, đảm bảo tuân thủ CV 5512 và phát triển năng lực toán học cho học sinh.`,
+Vui lòng tạo kế hoạch bài dạy chi tiết theo cấu trúc trên, đảm bảo tuân thủ CV 5512 và phát triển năng lực toán học cho học sinh.`,
         difficulty: 'intermediate',
         recommendedTools: ['geogebra', 'desmos', 'canva-ai'],
         tags: ['CV5512', 'GDPT2018', 'NăngLựcToánHọc', 'TưDuyLogic'],
@@ -73,7 +73,7 @@ Vui lòng tạo giáo án chi tiết theo cấu trúc trên, đảm bảo tuân 
         examples: [
             {
                 title: 'Phương trình bậc nhất - Lớp 8',
-                description: 'Ví dụ giáo án về phương trình bậc nhất một ẩn',
+                description: 'Ví dụ kế hoạch bài dạy về phương trình bậc nhất một ẩn',
                 sampleInput: {
                     lessonName: 'Phương trình bậc nhất một ẩn',
                     gradeLevel: '8',
@@ -81,7 +81,7 @@ Vui lòng tạo giáo án chi tiết theo cấu trúc trên, đảm bảo tuân 
                     topicContext: 'Tính tuổi, tính chi phí mua hàng',
                     explorationActivity: 'Cho HS giải bài toán tìm số tự nhiên, dẫn đến phương trình'
                 },
-                expectedOutput: 'Giáo án 5 cột chi tiết với các hoạt động cụ thể...'
+                expectedOutput: 'Kế hoạch bài dạy 5 cột chi tiết với các hoạt động cụ thể...'
             }
         ]
     },
@@ -91,7 +91,7 @@ Vui lòng tạo giáo án chi tiết theo cấu trúc trên, đảm bảo tuân 
         subject: 'Văn',
         gradeLevel: [6, 7, 8, 9],
         outputType: 'lesson-plan',
-        templateContent: `Bạn là giáo viên Ngữ văn THCS giàu kinh nghiệm. Hãy soạn giáo án phân tích tác phẩm "{{workTitle}}" của tác giả {{author}} cho lớp {{gradeLevel}}.
+        templateContent: `Bạn là giáo viên Ngữ văn THCS giàu kinh nghiệm. Hãy soạn kế hoạch bài dạy phân tích tác phẩm "{{workTitle}}" của tác giả {{author}} cho lớp {{gradeLevel}}.
 
 **THÔNG TIN TÁC PHẨM:**
 - Tên tác phẩm: {{workTitle}}
@@ -153,7 +153,7 @@ Vui lòng tạo giáo án chi tiết theo cấu trúc trên, đảm bảo tuân 
 - Đánh giá kỹ năng phân tích, lập luận
 - Đánh giá thái độ học tập và tham gia hoạt động
 
-Hãy tạo giáo án chi tiết theo hướng dẫn trên, phù hợp với đặc điểm tác phẩm và trình độ học sinh.`,
+Hãy tạo kế hoạch bài dạy chi tiết theo hướng dẫn trên, phù hợp với đặc điểm tác phẩm và trình độ học sinh.`,
         difficulty: 'intermediate',
         recommendedTools: ['chatgpt', 'gemini', 'canva-ai'],
         tags: ['VănHọc', 'PhânTích', 'CảmThụ', 'TưDuyVănHọc'],
@@ -180,7 +180,7 @@ Hãy tạo giáo án chi tiết theo hướng dẫn trên, phù hợp với đ�
                     gradeLevel: '9',
                     objectives: 'Hiểu nội dung và nghệ thuật của bài thơ, cảm nhận tâm trạng của tác giả'
                 },
-                expectedOutput: 'Giáo án phân tích chi tiết bài thơ với các hoạt động cụ thể...'
+                expectedOutput: 'Kế hoạch bài dạy phân tích chi tiết bài thơ với các hoạt động cụ thể...'
             }
         ]
     }

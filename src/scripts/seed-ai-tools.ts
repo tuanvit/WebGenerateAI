@@ -14,14 +14,14 @@ const aiToolsData = [
         category: 'TEXT_GENERATION',
         subjects: JSON.stringify(['Toán', 'Văn', 'Khoa học tự nhiên', 'Lịch sử & Địa lí', 'Giáo dục công dân', 'Công nghệ']),
         gradeLevel: JSON.stringify([6, 7, 8, 9]),
-        useCase: 'Tạo giáo án, câu hỏi kiểm tra, bài tập, giải thích khái niệm',
+        useCase: 'Tạo kế hoạch bài dạy, câu hỏi kiểm tra, bài tập, giải thích khái niệm',
         vietnameseSupport: true,
         difficulty: 'beginner',
         features: JSON.stringify(['Tạo văn bản', 'Trả lời câu hỏi', 'Giải thích khái niệm', 'Tạo bài tập', 'Dịch thuật']),
         pricingModel: 'freemium',
         integrationInstructions: 'Sao chép prompt được tạo và dán vào ChatGPT. Có thể tùy chỉnh thêm theo nhu cầu cụ thể.',
         samplePrompts: JSON.stringify([
-            'Tạo giáo án môn Toán lớp 8 về phương trình bậc nhất',
+            'Tạo kế hoạch bài dạy môn Toán lớp 8 về phương trình bậc nhất',
             'Giải thích khái niệm hàm số cho học sinh lớp 9',
             'Tạo 10 câu hỏi trắc nghiệm về lịch sử Việt Nam'
         ]),

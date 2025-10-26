@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { PromptTemplate, TemplateVariable } from '@/services/templates/SubjectTemplateService';
+import React, { useEffect, useState } from 'react';
 
 // Helper functions
 const getDifficultyColor = (difficulty: string) => {
@@ -24,7 +24,7 @@ const getDifficultyText = (difficulty: string) => {
 
 const getOutputTypeText = (outputType: string) => {
     switch (outputType) {
-        case 'lesson_plan': return 'Giáo án';
+        case 'lesson_plan': return 'Kế hoạch bài dạy';
         case 'presentation': return 'Bài thuyết trình';
         case 'assessment': return 'Đánh giá';
         case 'activity': return 'Hoạt động';

@@ -200,7 +200,7 @@ export default function EnhancedPromptGenerationForm({
 
     const getFormTitle = () => {
         switch (type) {
-            case 'lesson-plan': return 'Tạo prompt giáo án'
+            case 'lesson-plan': return 'Tạo prompt kế hoạch bài dạy'
             case 'presentation': return 'Tạo prompt slide thuyết trình'
             case 'assessment': return 'Tạo prompt câu hỏi đánh giá'
             default: return 'Tạo prompt'
@@ -350,7 +350,7 @@ export default function EnhancedPromptGenerationForm({
 
                             <div>
                                 <label htmlFor="outputFormat" className="block text-sm font-medium text-gray-700 mb-2">
-                                    Định dạng giáo án
+                                    Định dạng kế hoạch bài dạy
                                 </label>
                                 <select
                                     id="outputFormat"

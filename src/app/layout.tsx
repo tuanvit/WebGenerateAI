@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AI Prompt Generator for Teachers",
-  description: "Hệ thống tạo prompt AI cho giáo viên Việt Nam - Hỗ trợ tạo giáo án và nội dung giảng dạy theo chuẩn GDPT 2018",
+  description: "Hệ thống tạo prompt AI cho giáo viên Việt Nam - Hỗ trợ tạo kế hoạch bài dạy và nội dung giảng dạy theo chuẩn GDPT 2018",
 };
 
 export default function RootLayout({

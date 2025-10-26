@@ -22,7 +22,7 @@
 
 ## 🚀 **User Flow**:
 1. **Trang chủ**: Click "Tạo Prompt Chuyên Nghiệp" → `/create-prompt`
-2. **Dashboard**: Click "Bắt đầu tạo" (giáo án/slide/đánh giá) → `/create-prompt`
+2. **Dashboard**: Click "Bắt đầu tạo" (kế hoạch bài dạy/slide/đánh giá) → `/create-prompt`
 3. **Header**: Click "✨ Tạo Prompt" → `/create-prompt`
 
 **Tất cả các nút giờ đều dẫn đến trang create-prompt đúng như mong muốn!** 🎉

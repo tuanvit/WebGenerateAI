@@ -92,7 +92,7 @@ export default function PersonalLibraryPage() {
                         <div>
                             <h1 className="text-3xl font-bold text-gray-900">Thư viện cá nhân</h1>
                             <p className="mt-2 text-gray-600">
-                                Quản lý các prompt và giáo án bạn đã tạo và lưu trữ
+                                Quản lý các prompt và kế hoạch bài dạy bạn đã tạo và lưu trữ
                             </p>
                         </div>
 

@@ -8,7 +8,7 @@
 
 #### **SubjectTemplateService**
 - 3 template mẫu cho các môn học chính:
-  - **Toán học**: Giáo án theo CV 5512 với cấu trúc 5 cột
+  - **Toán học**: Kế hoạch bài dạy theo CV 5512 với cấu trúc 5 cột
   - **Ngữ văn**: Phân tích tác phẩm văn học
   - **Khoa học tự nhiên**: Thí nghiệm và mô phỏng
 

@@ -60,7 +60,7 @@ export function CommunityStats({ className = '' }: CommunityStatsProps) {
                     },
                     {
                         id: '2',
-                        title: 'Giáo án Toán 8 - Phương trình bậc nhất một ẩn',
+                        title: 'Kế hoạch bài dạy Toán 8 - Phương trình bậc nhất một ẩn',
                         rating: 4.8,
                         ratingCount: 134
                     },
@@ -79,7 +79,7 @@ export function CommunityStats({ className = '' }: CommunityStatsProps) {
                     },
                     {
                         type: 'rate',
-                        content: 'Thầy Minh đã đánh giá 5 sao cho "Giáo án Hóa học"',
+                        content: 'Thầy Minh đã đánh giá 5 sao cho "Kế hoạch bài dạy Hóa học"',
                         time: '12 phút trước'
                     },
                     {

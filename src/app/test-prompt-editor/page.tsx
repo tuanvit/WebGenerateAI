@@ -7,7 +7,7 @@ import PromptEditor from "@/components/prompt/PromptEditor"
 
 export default function TestPromptEditorPage() {
     const { data: session } = useSession()
-    const [samplePrompt] = useState(`Bạn là một giáo viên Lịch sử chuyên nghiệp. Hãy tạo một giáo án chi tiết cho bài học "Chiến tranh thế giới thứ nhất" dành cho học sinh lớp 8.
+    const [samplePrompt] = useState(`Bạn là một giáo viên Lịch sử chuyên nghiệp. Hãy tạo một kế hoạch bài dạy chi tiết cho bài học "Chiến tranh thế giới thứ nhất" dành cho học sinh lớp 8.
 
 **Thông tin bài học:**
 - Môn học: Lịch sử
@@ -21,7 +21,7 @@ export default function TestPromptEditorPage() {
 - Bao gồm hoạt động cá nhân và nhóm
 - Có đánh giá năng lực học sinh
 
-**Định dạng giáo án 5 cột:**
+**Định dạng kế hoạch bài dạy 5 cột:**
 1. Hoạt động của giáo viên
 2. Hoạt động của học sinh  
 3. Nội dung kiến thức

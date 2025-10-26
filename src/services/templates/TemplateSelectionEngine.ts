@@ -353,7 +353,7 @@ export class TemplateSelectionEngine {
         }
 
         if (template.compliance.includes('CV 5512')) {
-            useCases.push('Giáo án chính thức theo quy định');
+            useCases.push('Kế hoạch bài dạy chính thức theo quy định');
         }
 
         if (template.variables.length > 6) {
@@ -385,7 +385,7 @@ export class TemplateSelectionEngine {
      */
     private getOutputTypeText(outputType: string): string {
         const texts = {
-            'lesson-plan': 'Giáo án',
+            'lesson-plan': 'Kế hoạch bài dạy',
             'presentation': 'Thuyết trình',
             'assessment': 'Đánh giá',
             'interactive': 'Tương tác',

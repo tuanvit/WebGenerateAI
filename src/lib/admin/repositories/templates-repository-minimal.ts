@@ -36,8 +36,8 @@ export class TemplatesRepository {
     private templates: TemplateData[] = [
         {
             id: 'template-1',
-            name: 'Giáo án Toán lớp 6',
-            description: 'Template tạo giáo án môn Toán cho lớp 6',
+            name: 'Kế hoạch bài dạy Toán lớp 6',
+            description: 'Template tạo kế hoạch bài dạy môn Toán cho lớp 6',
             subject: 'Toán',
             gradeLevel: [6],
             outputType: 'lesson-plan',

@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
 import { PromptTemplate } from '@/services/templates/SubjectTemplateService';
-import TemplateRecommendations from './TemplateRecommendations';
 import { TemplateSelectionCriteria } from '@/services/templates/TemplateSelectionEngine';
+import { useEffect, useState } from 'react';
+import TemplateRecommendations from './TemplateRecommendations';
 
 interface TemplateSelectorProps {
     subject: string;
@@ -99,7 +99,7 @@ export default function TemplateSelector({
 
     const getOutputTypeText = (outputType: string) => {
         const texts = {
-            'lesson-plan': 'Giáo án',
+            'lesson-plan': 'Kế hoạch bài dạy',
             'presentation': 'Thuyết trình',
             'assessment': 'Đánh giá',
             'interactive': 'Tương tác',

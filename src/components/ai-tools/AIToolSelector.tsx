@@ -236,7 +236,7 @@ export default function AIToolSelector({
                             ? '🎯 Công cụ AI từ template đã chọn'
                             : outputType === 'curriculum-creation'
                                 ? 'Công cụ AI đề xuất cho tạo giáo trình'
-                                : 'Công cụ AI đề xuất cho giáo án'
+                                : 'Công cụ AI đề xuất cho kế hoạch bài dạy'
                         }
                     </h3>
                     <button

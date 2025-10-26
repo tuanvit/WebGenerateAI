@@ -56,9 +56,9 @@ export async function POST(request: NextRequest) {
                 authorId: sampleUser.id
             },
             {
-                title: 'Giáo án Toán 8 - Phương trình bậc nhất một ẩn',
-                description: 'Giáo án chi tiết cho chương phương trình bậc nhất một ẩn',
-                content: `# Giáo án: Phương trình bậc nhất một ẩn
+                title: 'Kế hoạch bài dạy Toán 8 - Phương trình bậc nhất một ẩn',
+                description: 'Kế hoạch bài dạy chi tiết cho chương phương trình bậc nhất một ẩn',
+                content: `# Kế hoạch bài dạy: Phương trình bậc nhất một ẩn
 
 ## I. Mục tiêu
 - Kiến thức: Nắm được khái niệm phương trình bậc nhất một ẩn

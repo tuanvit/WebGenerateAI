@@ -115,7 +115,7 @@ export default function TemplatesPage() {
                                 <div className="space-y-2">
                                     {Object.entries(stats.byOutputType).map(([type, count]) => {
                                         const typeNames: Record<string, string> = {
-                                            'lesson-plan': 'Giáo án',
+                                            'lesson-plan': 'Kế hoạch bài dạy',
                                             'presentation': 'Bài thuyết trình',
                                             'assessment': 'Đánh giá',
                                             'interactive': 'Tương tác',

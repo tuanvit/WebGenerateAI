@@ -56,7 +56,7 @@ interface AIToolSelectorProps {
 ### Template với AI Tools
 ```json
 {
-    "name": "Giáo án Toán theo CV 5512",
+    "name": "Kế hoạch bài dạy Toán theo CV 5512",
     "subject": "Toán",
     "gradeLevel": [6, 7, 8, 9],
     "outputType": "lesson-plan",
@@ -101,7 +101,7 @@ interface AIToolSelectorProps {
    - Header: "🎯 Công cụ AI từ template đã chọn"
 4. **Chế độ Tự do**:
    - Không chọn template → AI tools đề xuất theo logic cũ
-   - Header: "Công cụ AI đề xuất cho giáo án"
+   - Header: "Công cụ AI đề xuất cho kế hoạch bài dạy"
 
 ### For Developers:
 - Template phải có field `recommendedTools: string[]`

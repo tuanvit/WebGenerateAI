@@ -1,6 +1,6 @@
+import { BloomTaxonomyLevel, PEDAGOGICAL_STANDARDS, TargetAITool } from '@/types/prompt';
+import { GRADE_LEVELS, VIETNAMESE_SUBJECTS, type VietnameseSubject } from '@/types/user';
 import { z } from 'zod';
-import { VIETNAMESE_SUBJECTS, GRADE_LEVELS, type GradeLevel, type VietnameseSubject } from '@/types/user';
-import { PEDAGOGICAL_STANDARDS, TargetAITool, BloomTaxonomyLevel } from '@/types/prompt';
 import { VIETNAMESE_ERROR_MESSAGES } from './error-handling';
 
 // Educational standards validation
@@ -97,7 +97,7 @@ export const EnhancedLessonPlanInputSchema = z.object({
     lessonName: EnhancedLessonNameSchema,
     pedagogicalStandard: EnhancedPedagogicalStandardSchema,
     outputFormat: z.enum(['four-column', 'five-column'], {
-        errorMap: () => ({ message: 'Định dạng giáo án phải là 4 cột hoặc 5 cột' })
+        errorMap: () => ({ message: 'Định dạng kế hoạch bài dạy phải là 4 cột hoặc 5 cột' })
     }),
     targetTool: z.nativeEnum(TargetAITool, {
         errorMap: () => ({ message: 'Công cụ AI không hợp lệ' })

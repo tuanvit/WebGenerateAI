@@ -7,19 +7,19 @@ export const AI_TOOLS_DATABASE: AIToolDetails[] = [
     {
         id: 'chatgpt',
         name: 'ChatGPT',
-        description: 'Công cụ AI tạo văn bản mạnh mẽ cho soạn giáo án và câu hỏi',
+        description: 'Công cụ AI tạo văn bản mạnh mẽ cho soạn kế hoạch bài dạy và câu hỏi',
         url: 'https://chat.openai.com/',
         category: AIToolCategory.TEXT_GENERATION,
         subjects: ['Toán', 'Văn', 'Khoa học tự nhiên', 'Lịch sử & Địa lí', 'Giáo dục công dân', 'Công nghệ'],
         gradeLevel: [6, 7, 8, 9],
-        useCase: 'Soạn giáo án, tạo câu hỏi, phát triển nội dung bài học',
+        useCase: 'Soạn kế hoạch bài dạy, tạo câu hỏi, phát triển nội dung bài học',
         vietnameseSupport: true,
         difficulty: 'beginner',
-        features: ['Tạo giáo án theo CV 5512', 'Câu hỏi phân loại Bloom', 'Hỗ trợ tiếng Việt'],
+        features: ['Tạo kế hoạch bài dạy theo CV 5512', 'Câu hỏi phân loại Bloom', 'Hỗ trợ tiếng Việt'],
         pricingModel: 'freemium',
         integrationInstructions: 'Dán prompt đã tạo vào ChatGPT và nhấn Enter',
         samplePrompts: [
-            'Soạn giáo án môn Toán lớp 8 bài "Phương trình bậc nhất một ẩn"',
+            'Soạn kế hoạch bài dạy môn Toán lớp 8 bài "Phương trình bậc nhất một ẩn"',
             'Tạo 10 câu hỏi trắc nghiệm môn Văn về "Tự tình II" của Hồ Xuân Hương'
         ],
         relatedTools: ['gemini', 'copilot']
@@ -52,7 +52,7 @@ export const AI_TOOLS_DATABASE: AIToolDetails[] = [
         category: AIToolCategory.TEXT_GENERATION,
         subjects: ['Toán', 'Văn', 'Khoa học tự nhiên', 'Lịch sử & Địa lí', 'Giáo dục công dân', 'Công nghệ'],
         gradeLevel: [6, 7, 8, 9],
-        useCase: 'Soạn giáo án, tạo nội dung, phân tích dữ liệu Excel',
+        useCase: 'Soạn kế hoạch bài dạy, tạo nội dung, phân tích dữ liệu Excel',
         vietnameseSupport: true,
         difficulty: 'beginner',
         features: ['Tích hợp Office 365', 'Excel Copilot', 'PowerPoint Designer'],

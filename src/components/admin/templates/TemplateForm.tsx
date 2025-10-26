@@ -66,7 +66,7 @@ const SUBJECTS = [
 ];
 
 const OUTPUT_TYPES = [
-    { value: 'lesson-plan', label: 'Giáo án' },
+    { value: 'lesson-plan', label: 'Kế hoạch bài dạy' },
     { value: 'presentation', label: 'Bài thuyết trình' },
     { value: 'assessment', label: 'Đánh giá' },
     { value: 'interactive', label: 'Tương tác' },

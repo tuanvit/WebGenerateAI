@@ -2,8 +2,8 @@
 
 import { FileUpload } from '@/components/forms/FileUpload';
 import { PromptDisplay } from '@/components/forms/PromptDisplay';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 // import { AIToolButtons } from '@/components/integration/AIToolButtons';
 import AIToolSelector from '@/components/ai-tools/AIToolSelector';
 import PromptEditor from '@/components/prompt/PromptEditor';
@@ -55,11 +55,11 @@ export default function CreatePromptPage() {
     // Configuration for each output type
     const outputTypeConfig = {
         'lesson-plan': {
-            label: 'Giáo án',
+            label: 'Kế hoạch bài dạy',
             icon: '📚',
-            buttonText: 'Tạo Prompt Giáo Án',
+            buttonText: 'Tạo Prompt Kế Hoạch Bài Dạy',
             recommendedTools: ['chatgpt', 'gemini', 'copilot'],
-            description: 'Tạo giáo án chi tiết tuân thủ GDPT 2018'
+            description: 'Tạo kế hoạch bài dạy chi tiết tuân thủ GDPT 2018'
         },
         'presentation': {
             label: 'Bài thuyết trình',
@@ -368,7 +368,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                             Tạo Prompt Giáo Dục
                         </h1>
                         <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                            Hệ thống thông minh tạo prompt cho giáo án, bài thuyết trình, đánh giá và tài liệu giảng dạy tuân thủ GDPT 2018 và CV 5512
+                            Hệ thống thông minh tạo prompt cho kế hoạch bài dạy, bài thuyết trình, đánh giá và tài liệu giảng dạy tuân thủ GDPT 2018 và CV 5512
                         </p>
                     </div>
                 </div>
@@ -432,7 +432,7 @@ Vui lòng trả lời bằng tiếng Việt và tuân thủ chặt chẽ các y�
                                         onChange={(e) => handleInputChange('outputType', e.target.value)}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                     >
-                                        <option value="lesson-plan">📚 Giáo án</option>
+                                        <option value="lesson-plan">📚 Kế hoạch bài dạy</option>
                                         <option value="presentation">📊 Bài thuyết trình</option>
                                         <option value="assessment">📝 Đánh giá/Kiểm tra</option>
                                         <option value="interactive">🎮 Hoạt động tương tác</option>

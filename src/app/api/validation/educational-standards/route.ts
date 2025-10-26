@@ -107,7 +107,7 @@ export const GET = asyncHandler(async (request: Request) => {
 
     const guidelines = {
         'lesson-plan': {
-            title: 'Hướng dẫn tạo giáo án theo GDPT 2018 và CV 5512',
+            title: 'Hướng dẫn tạo kế hoạch bài dạy theo GDPT 2018 và CV 5512',
             requirements: [
                 'Tên bài học phải phản ánh mục tiêu và nội dung cụ thể',
                 'Tuân thủ cấu trúc 4 hoặc 5 cột theo CV 5512',

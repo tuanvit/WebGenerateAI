@@ -78,7 +78,7 @@ export default function Library() {
                     <div className="bg-white rounded-lg shadow p-6">
                         <h2 className="text-xl font-semibold text-gray-900 mb-4">Thư viện cá nhân</h2>
                         <p className="text-gray-600 mb-4">
-                            Quản lý các prompt và giáo án bạn đã tạo và lưu trữ.
+                            Quản lý các prompt và kế hoạch bài dạy bạn đã tạo và lưu trữ.
                         </p>
                         <Link
                             href="/library/personal"
